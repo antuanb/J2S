@@ -45,16 +45,16 @@ public class StackOverflowData {
 	public static void executeGoogleSearchQuery() {
 		GoogleSearchQueryFactory factory = GoogleSearchQueryFactory.newInstance("applicationKey");
 		WebSearchQuery query = factory.newWebSearchQuery();
-//		com.googleapis.ajax.common.PagedList<WebResult> response = query.withQuery("hadoop").list();
-//		System.out.println(response.getCurrentPageIndex());
-//		System.out.println(response.getEstimatedResultCount());
-//		System.out.println(response.getMoreResultsUrl());
-//		System.out.println(response.getPages());
-//		for (WebResult result : response) {
-//		        System.out.println(result.getTitle());                  
-//		        System.out.println(result.getContent());                        
-//		        System.out.println(result.getUrl());                    
-//		        System.out.println("=======================================");                  
-//		}
+		com.googleapis.ajax.common.PagedList<WebResult> response = query.withQuery("location swift website:www.stackoverflow.com").list();
+		System.out.println(response.getCurrentPageIndex());
+		System.out.println(response.getEstimatedResultCount());
+		System.out.println(response.getMoreResultsUrl());
+		System.out.println(response.getPages());
+		for (WebResult result : response) {
+		        System.out.println(result.getTitle());                  
+		        System.out.println(result.getContent());                        
+		        System.out.println(result.getUrl());                    
+		        System.out.println("=======================================");                  
+		}
 	}
 }
