@@ -4,6 +4,7 @@ package j2s;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
@@ -55,11 +56,14 @@ public class J2SView extends ViewPart {
 		public void widgetSelected(SelectionEvent arg0) {
 			label.setForeground(new Color (Display.getCurrent (), 255, 0, 0));
 			
-			String filename = "methodSelection.txt";
-			
+			String filename = "C:\\Users\\Antuan\\Downloads\\methodSelection.txt";
+			File file = new File(filename);
+			file.setReadable(true);
+			file.setWritable(true);
 			PrintWriter writer = null;
 			try {
-				writer = new PrintWriter(new File(filename));
+				writer = new PrintWriter(file);
+				
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -68,7 +72,10 @@ public class J2SView extends ViewPart {
 			writer.close();
 			
 			GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
-			tester.executeFrequencyAnalysis(filename);
+			ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
+			
+			StackOverflowData SOD = new StackOverflowData();
+			ArrayList<String> resultQuery = SOD.executeStackOverflowQuery(searchKeywords);
 			
 			
 			// calls static class in submodule

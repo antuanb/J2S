@@ -1,5 +1,7 @@
 package j2s;
 
+import java.util.ArrayList;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -8,9 +10,9 @@ import com.google.code.stackexchange.common.PagedList;
 import com.google.code.stackexchange.schema.Question;
 import com.google.code.stackexchange.schema.User.QuestionSortOrder;
 
-public class StackOverflowTester {
+public class StackOverflowData {
 	
-	public static void main(String[] args) {
+	public static ArrayList<String> executeStackOverflowQuery(ArrayList<String> keywords) {
 		
 		StackExchangeApiQueryFactory queryFactory = StackExchangeApiQueryFactory.newInstance();
 		
@@ -27,5 +29,9 @@ public class StackOverflowTester {
 		
 		Document doc = Jsoup.parse(answer);
 		System.out.println(doc.getElementsByTag("code").get(0).text());
+		
+		ArrayList<String> searchResult = new ArrayList<String>();
+		
+		return searchResult;
 	}
 }

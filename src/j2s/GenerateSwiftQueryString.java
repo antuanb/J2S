@@ -3,6 +3,7 @@ package j2s;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ public class GenerateSwiftQueryString {
 
 	private static HashMap<String, Integer> frequency = new HashMap<String, Integer>();
 	private static HashSet<String> filterKeys;
+	private static final int NUM_FREQ_RETURN = 1;
 
 	static {
 		filterKeys = new HashSet<String>();
@@ -34,7 +36,7 @@ public class GenerateSwiftQueryString {
 		filterKeys.add("]");
 	}
 
-	public void executeFrequencyAnalysis(String filepath) {
+	public ArrayList<String> executeFrequencyAnalysis(String filepath) {
 		BufferedReader br = null;
 		try {
 			String sCurrentLine;
@@ -60,11 +62,16 @@ public class GenerateSwiftQueryString {
 		}
 
 		filterFrequency();
-		sortByValue();
-		// System.out.println();
+		ArrayList<String> result = sortByValue();
+		frequency = new HashMap<String, Integer>();
+		ArrayList<String> keywords = new ArrayList<String>();
+		for (int i = 0; i < NUM_FREQ_RETURN; i++) {
+			keywords.add(result.get(result.size()-i+1));
+		}
+		return keywords;
 	}
 
-	public static <K, V extends Comparable<? super V>> Map<String, Integer> sortByValue() {
+	public static ArrayList<String> sortByValue() {
 		HashMap<String, Integer> newFrequency = new HashMap<String, Integer>();
 		List<String> keySetFrequency = new LinkedList<String>();
 		keySetFrequency.addAll(frequency.keySet());
@@ -96,12 +103,14 @@ public class GenerateSwiftQueryString {
 
 		});
 
-		Map<String, Integer> result = new LinkedHashMap<>();
-
+		Map<String, Integer> fullResult = new LinkedHashMap<>();
+		ArrayList<String> result = new ArrayList<String>();
 		for (Map.Entry<String, Integer> entry : list) {
-			result.put(entry.getKey(), entry.getValue());
+			fullResult.put(entry.getKey(), entry.getValue());
+			result.add(entry.getKey());
 		}
-		System.out.println(result.toString());
+		Collections.reverse(result);
+		System.out.println(fullResult.toString());
 
 		return result;
 	}
