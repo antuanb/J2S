@@ -16,5 +16,8 @@
 	<classpathentry kind="lib" path="libs/stackoverflow-java-sdk-release-2.2.1-SNAPSHOT-release.jar"/>
 	<classpathentry kind="lib" path="libs/gson-2.3.1.jar"/>
 	<classpathentry kind="lib" path="libs/jsoup-1.8.2.jar"/>
+	<classpathentry kind="lib" path="libs/google-ajax-apis.jar"/>
+	<classpathentry kind="lib" path="libs/googleapis-ajax-core-0.1.jar"/>
+	<classpathentry kind="lib" path="libs/googleapis-ajax-schema-0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

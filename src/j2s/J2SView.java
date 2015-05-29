@@ -57,6 +57,7 @@ public class J2SView extends ViewPart {
 			label.setForeground(new Color (Display.getCurrent (), 255, 0, 0));
 			
 			String filename = "C:\\Users\\Antuan\\Downloads\\methodSelection.txt";
+//			String filename = System.getProperty("user.Home") + "/Downloads";
 			File file = new File(filename);
 			file.setReadable(true);
 			file.setWritable(true);
