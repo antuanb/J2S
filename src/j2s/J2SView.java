@@ -75,8 +75,7 @@ public class J2SView extends ViewPart {
 			GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
 			ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
 			
-			StackOverflowData SOD = new StackOverflowData();
-			ArrayList<String> resultQuery = SOD.executeStackOverflowQuery(searchKeywords);
+			SearchAndRank sar = new SearchAndRank(searchKeywords);
 			
 			
 			// calls static class in submodule
