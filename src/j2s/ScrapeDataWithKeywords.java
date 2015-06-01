@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.Jsoup;
@@ -32,32 +34,44 @@ public class ScrapeDataWithKeywords {
 	// if doing non stackoverflow (like blogs or other info) how
 	// to strip away code and also how do we know importance?
 	// Can use questions vote count, view count, etc as features
-	public static ArrayList<String> executeStackOverflowQuery(String keywords) {
-		StackExchangeApiQueryFactory queryFactory = StackExchangeApiQueryFactory.newInstance();
+	public static ArrayList<Answer> executeStackOverflowQuery(String keywords) {
+		//StackExchangeApiQueryFactory queryFactory = StackExchangeApiQueryFactory.newInstance();
 		StackExchangeApiClientFactory clientFactory = StackExchangeApiClientFactory.newInstance(null, StackExchangeSite.STACK_OVERFLOW);
 		StackExchangeApiClient client = clientFactory.createStackExchangeApiClient();
-		
+		ArrayList<Answer> searchResult = new ArrayList<Answer>();
 		ArrayList<String> tags = new ArrayList<String>(Arrays.asList("ios", "swift"));
 		
 		PagedList<Question> questions = null;
 		
-		if (keywords.startsWith("http")) {
-			questions = queryFactory.newAdvanceSearchApiQuery().withURL(keywords).list();
+		long qId = -1;
+		if (Character.isDigit(keywords.charAt(0))) {
+			//Question q = queryFactory.newAdvanceSearchApiQuery().withURL(keywords).withTags(tags).singleResult();
+			qId = Long.parseLong(keywords);
+			System.out.println("test");
 		} else {
 			questions = client.searchQuestions(keywords, tags, null, QuestionSortOrder.MOST_RELEVANT, null);
 		}
-		
-		Question question = questions.get(0);
-		
-		PagedList<Answer> answers = client.getAnswersByQuestions(SortOrder.MOST_VOTED, "WITHBODY", question.getQuestionId());
+		if (qId != -1) {
+			PagedList<Answer> answers = client.getAnswersByQuestions(SortOrder.MOST_VOTED, "WITHBODY", qId);
+			if (answers.size() == 0) {
+				return searchResult;
+			}
+			searchResult.add(answers.get(0));
+			System.out.println(answers.get(0).getBody());
+			return searchResult;
+		}
+		for (Question q : questions) {
+			PagedList<Answer> answers = client.getAnswersByQuestions(SortOrder.MOST_VOTED, "WITHBODY", q.getQuestionId());
+			if (answers.size() == 0) {
+				continue;
+			}
+			searchResult.add(answers.get(0));
+		}
 
-		String answer = answers.get(0).getBody();
-		ArrayList<String> searchResult = new ArrayList<String>();
-		searchResult.add(answer);
 		return searchResult;
 	}
 
-	public static HashMap<String, String> executeGoogleSearchQuery_Stack(
+	public static ArrayList<HashMap<String, String>> executeGoogleSearchQuery_Stack(
 			String keywords) {
 		GoogleSearchQueryFactory factory = GoogleSearchQueryFactory
 				.newInstance("applicationKey");
@@ -66,12 +80,20 @@ public class ScrapeDataWithKeywords {
 		com.googleapis.ajax.common.PagedList<WebResult> response = query
 				.withQuery(keywords + "swift website:www.stackoverflow.com")
 				.list();
-
-		HashMap<String, String> googleSearchResults = new HashMap<String, String>();
+		ArrayList<HashMap<String, String>> googleSearchResults = new ArrayList<HashMap<String, String>>();
+		HashMap<String, String> googleSearchResult = new HashMap<String, String>();
 		for (WebResult result : response) {
-			googleSearchResults.put("title", result.getTitle());
-			googleSearchResults.put("content", result.getContent());
-			googleSearchResults.put("url", result.getUrl());
+			if (result.getUrl().startsWith("http://stackoverflow.com/questions/")) {
+				Pattern p = Pattern.compile("^[^\\d]*(\\d+)");
+				Matcher m = p.matcher(result.getUrl());
+				if (m.find()) {
+					googleSearchResult.put("id", m.group(1));
+				}
+			}
+			googleSearchResult.put("title", result.getTitle());
+			googleSearchResult.put("content", result.getContent());
+			googleSearchResult.put("url", result.getUrl());
+			googleSearchResults.add(googleSearchResult);
 		}
 		return googleSearchResults;
 	}
@@ -98,7 +120,7 @@ public class ScrapeDataWithKeywords {
 		return googleSearchResults;
 	}
 
-	private static ArrayList<String> parseHTMLForCode(String input) {
+	public static ArrayList<String> parseHTMLForCode(String input) {
 		Document doc = null;
 		if (input.startsWith("http")) {
 			try {
@@ -126,8 +148,9 @@ public class ScrapeDataWithKeywords {
 	}
 
 	public static void main(String args[]) {
-		System.out.println(parseHTMLForCode(executeStackOverflowQuery("user location").get(0)).get(0));
-		
+		//System.out.println(executeStackOverflowQuery("26109669"));
+
+
 		//executeStackOverflowQuery("location");
 		//String url = executeStackOverflowQuery("").get(
 		//		2).get("url");
