@@ -3,15 +3,22 @@ package j2s;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import com.google.code.stackexchange.client.StackExchangeApiClient;
+import com.google.code.stackexchange.client.StackExchangeApiClientFactory;
+import com.google.code.stackexchange.client.query.AnswerApiQuery;
 import com.google.code.stackexchange.client.query.StackExchangeApiQueryFactory;
 import com.google.code.stackexchange.common.PagedList;
+import com.google.code.stackexchange.schema.Answer;
+import com.google.code.stackexchange.schema.Answer.SortOrder;
 import com.google.code.stackexchange.schema.Question;
+import com.google.code.stackexchange.schema.StackExchangeSite;
 import com.google.code.stackexchange.schema.User.QuestionSortOrder;
 import com.googleapis.ajax.schema.WebResult;
 import com.googleapis.ajax.services.GoogleSearchQueryFactory;
@@ -24,24 +31,30 @@ public class ScrapeDataWithKeywords {
 	// need to figure out how to standardize returns from searches
 	// if doing non stackoverflow (like blogs or other info) how
 	// to strip away code and also how do we know importance?
+	// Can use questions vote count, view count, etc as features
 	public static ArrayList<String> executeStackOverflowQuery(String keywords) {
-
-		StackExchangeApiQueryFactory queryFactory = StackExchangeApiQueryFactory
-				.newInstance();
-
-		PagedList<Question> questions = queryFactory.newAdvanceSearchApiQuery()
-				//.withUrl(url)
-				.withTitle(keywords).withSort(QuestionSortOrder.MOST_RELEVANT)
-				.withTags("ios", "swift").withFilter("WITHBODY").list();
-
-		// System.out.println(questions.size());
-		String answer = questions.get(0).getBody();
-		// System.out.println(answer);
-
-		ArrayList<String> searchResult = new ArrayList<String>();
-
-		return searchResult;
+		StackExchangeApiQueryFactory queryFactory = StackExchangeApiQueryFactory.newInstance();
+		StackExchangeApiClientFactory clientFactory = StackExchangeApiClientFactory.newInstance(null, StackExchangeSite.STACK_OVERFLOW);
+		StackExchangeApiClient client = clientFactory.createStackExchangeApiClient();
 		
+		ArrayList<String> tags = new ArrayList<String>(Arrays.asList("ios", "swift"));
+		
+		PagedList<Question> questions = null;
+		
+		if (keywords.startsWith("http")) {
+			questions = queryFactory.newAdvanceSearchApiQuery().withURL(keywords).list();
+		} else {
+			questions = client.searchQuestions(keywords, tags, null, QuestionSortOrder.MOST_RELEVANT, null);
+		}
+		
+		Question question = questions.get(0);
+		
+		PagedList<Answer> answers = client.getAnswersByQuestions(SortOrder.MOST_VOTED, "WITHBODY", question.getQuestionId());
+
+		String answer = answers.get(0).getBody();
+		ArrayList<String> searchResult = new ArrayList<String>();
+		searchResult.add(answer);
+		return searchResult;
 	}
 
 	public static HashMap<String, String> executeGoogleSearchQuery_Stack(
@@ -113,12 +126,15 @@ public class ScrapeDataWithKeywords {
 	}
 
 	public static void main(String args[]) {
-		String url = executeGoogleSearchQuery_All("").get(
-				2).get("url");
-
+		System.out.println(parseHTMLForCode(executeStackOverflowQuery("user location").get(0)).get(0));
+		
+		//executeStackOverflowQuery("location");
+		//String url = executeStackOverflowQuery("").get(
+		//		2).get("url");
+		/*
 		for (String code : parseHTMLForCode(url)) {
 			System.out.println(code);
-		}
+		}*/
 	}
 
 }
