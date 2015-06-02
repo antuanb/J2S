@@ -22,7 +22,6 @@ public class GenerateSwiftQueryString {
 
 	static {
 		filterKeys = new HashSet<String>();
-		filterKeys.add("get");
 		filterKeys.add(" ");
 		filterKeys.add("public");
 		filterKeys.add("string");
