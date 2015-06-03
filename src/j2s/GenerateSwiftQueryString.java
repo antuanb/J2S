@@ -25,14 +25,24 @@ public class GenerateSwiftQueryString {
 		filterKeys.add(" ");
 		filterKeys.add("public");
 		filterKeys.add("string");
-		filterKeys.add(" ");
+		filterKeys.add("\n");
 		filterKeys.add(".");
+		filterKeys.add(",");
+		filterKeys.add(":");
 		filterKeys.add(";");
 		filterKeys.add("");
 		filterKeys.add("{");
 		filterKeys.add("}");
 		filterKeys.add("[");
 		filterKeys.add("]");
+		filterKeys.add("?");
+		filterKeys.add("-");
+		filterKeys.add(">");
+		filterKeys.add("<");
+		filterKeys.add("=");
+		filterKeys.add("!");
+		filterKeys.add("\\");
+		filterKeys.add("\"");
 	}
 
 	public ArrayList<String> executeFrequencyAnalysis(String filepath) {
@@ -61,8 +71,8 @@ public class GenerateSwiftQueryString {
 		}
 
 		filterFrequency();
-		ArrayList<String> result = sortByValue();
 		frequency = new HashMap<String, Integer>();
+		ArrayList<String> result = sortByValue(frequency);
 		ArrayList<String> keywords = new ArrayList<String>();
 		for (int i = 0; i < NUM_FREQ_RETURN; i++) {
 			keywords.add(result.get(result.size()-i+1));
@@ -70,7 +80,7 @@ public class GenerateSwiftQueryString {
 		return keywords;
 	}
 
-	public static ArrayList<String> sortByValue() {
+	public static ArrayList<String> sortByValue(HashMap<String, Integer> frequency) {
 		HashMap<String, Integer> newFrequency = new HashMap<String, Integer>();
 		List<String> keySetFrequency = new LinkedList<String>();
 		keySetFrequency.addAll(frequency.keySet());
@@ -134,7 +144,7 @@ public class GenerateSwiftQueryString {
 	}
 
 	private static void parseToken(String token) {
-		String[] tokens = token.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)");
+		String[] tokens = token.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)|(\\n)|(\\,)");
 		for (int i = 0; i < tokens.length; i++) {
 			tokens[i] = tokens[i].toLowerCase();
 		}
