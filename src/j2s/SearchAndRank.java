@@ -51,6 +51,7 @@ public class SearchAndRank {
 		filterKeys.add("!");
 		filterKeys.add("\\");
 		filterKeys.add("\"");
+		filterKeys.add("%");
 	}
 
 	public SearchAndRank(ArrayList<String> searchKeywords) {
