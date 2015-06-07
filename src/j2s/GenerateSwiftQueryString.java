@@ -43,6 +43,7 @@ public class GenerateSwiftQueryString {
 		filterKeys.add("!");
 		filterKeys.add("\\");
 		filterKeys.add("\"");
+		filterKeys.add("%");
 	}
 
 	public ArrayList<String> executeFrequencyAnalysis(String filepath) {
