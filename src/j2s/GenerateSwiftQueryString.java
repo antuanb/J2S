@@ -81,38 +81,61 @@ public class GenerateSwiftQueryString {
 	}
 
 	public static ArrayList<String> sortByValue(HashMap<String, Integer> frequency) {
-		HashMap<String, Integer> newFrequency = new HashMap<String, Integer>();
-		List<String> keySetFrequency = new LinkedList<String>();
-		keySetFrequency.addAll(frequency.keySet());
-		List<Integer> valueSetFrequency = new LinkedList<Integer>();
-		valueSetFrequency.addAll(frequency.values());
-		for (int i = 0; i < keySetFrequency.size(); i++) {
-			for (int j = 0; j < keySetFrequency.size(); j++) {
-				if (i != j) {
-					if (keySetFrequency.get(i).contains(keySetFrequency.get(j))) {
-						if (keySetFrequency.get(i).length() > keySetFrequency.get(j).length()) {
-							valueSetFrequency.set(i, valueSetFrequency.get(i) + valueSetFrequency.get(j));
-							keySetFrequency.remove(j);
-							valueSetFrequency.remove(j);
-						}
-					}
+		List<Map.Entry<String, Integer>> list = new LinkedList<>(frequency.entrySet());
+		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+			@Override
+			public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+				if (o1.getKey().length() < o2.getKey().length()) {
+					return -1;
+				}
+				else if (o1.getKey().length() == o2.getKey().length()) {
+					return 0;
+				}
+				else {
+					return 1;
 				}
 			}
+		});
+		Collections.reverse(list);
+		Map<String, Integer> fullResult = new LinkedHashMap<>();
+		for (Map.Entry<String, Integer> entry : list) {
+			fullResult.put(entry.getKey(), entry.getValue());
 		}
+		
+		List<String> keySetFrequency = new LinkedList<String>();
+		keySetFrequency.addAll(fullResult.keySet());
+		List<Integer> valueSetFrequency = new LinkedList<Integer>();
+		valueSetFrequency.addAll(fullResult.values());
+		HashMap<String, Integer> newFrequency = new HashMap<String, Integer>();
+		ArrayList<String> removalSetKey = new ArrayList<String>();
+		ArrayList<Integer> removalSetValue = new ArrayList<Integer>();
 		for (int i = 0; i < keySetFrequency.size(); i++) {
-			newFrequency.put(keySetFrequency.get(i), valueSetFrequency.get(i));
+			boolean flag = true;
+			for (int j = 0; j < removalSetKey.size(); j++) {
+				if (removalSetKey.get(j).contains(keySetFrequency.get(i))) {
+					removalSetValue.set(j, valueSetFrequency.get(i) + removalSetValue.get(j));
+					flag = false;
+					break;
+				}
+			}
+			if (flag) {
+				removalSetKey.add(keySetFrequency.get(i));
+				removalSetValue.add(valueSetFrequency.get(i));
+			}
 		}
-
-		List<Map.Entry<String, Integer>> list = new LinkedList<>(newFrequency.entrySet());
+		for (int i = 0; i < removalSetKey.size(); i++) {
+			newFrequency.put(removalSetKey.get(i), removalSetValue.get(i));
+		}
+		
+		list = new LinkedList<>(newFrequency.entrySet());
 		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
 			@Override
 			public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
 				return (o1.getValue()).compareTo(o2.getValue());
 			}
-
 		});
 
-		Map<String, Integer> fullResult = new LinkedHashMap<>();
+		fullResult = new LinkedHashMap<>();
 		ArrayList<String> result = new ArrayList<String>();
 		for (Map.Entry<String, Integer> entry : list) {
 			fullResult.put(entry.getKey(), entry.getValue());
