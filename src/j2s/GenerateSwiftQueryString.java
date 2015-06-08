@@ -87,7 +87,7 @@ public class GenerateSwiftQueryString {
 		ArrayList<String> result = sortByValue(frequency);
 		ArrayList<String> keywords = new ArrayList<String>();
 		for (int i = 0; i < NUM_FREQ_RETURN; i++) {
-			keywords.add(result.get(result.size()-i-1));
+			keywords.add(result.get(i));
 		}
 		
 		generateQueryMetaDataObject();

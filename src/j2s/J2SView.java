@@ -74,7 +74,7 @@ public class J2SView extends ViewPart {
 			
 			GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
 			ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
-			
+			System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());
 			SearchAndRank sar = new SearchAndRank(searchKeywords);
 			ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
 			System.out.println(rankedResults.get(0).getTitleTokens());

@@ -44,6 +44,9 @@ public class ScrapeDataWithKeywords {
 		PagedList<Question> questions = null;
 		
 		long qId = -1;
+		if (keywords == null) {
+			return searchResult;
+		}
 		if (Character.isDigit(keywords.charAt(0))) {
 			//Question q = queryFactory.newAdvanceSearchApiQuery().withURL(keywords).withTags(tags).singleResult();
 			qId = Long.parseLong(keywords);

@@ -102,7 +102,11 @@ public class SearchAndRank {
 			queryResultGoogleStack = ScrapeDataWithKeywords.executeGoogleSearchQuery_Stack(keyword);
 			Answer tempSingleQueryResultGoogleStack;
 			for (int i = 0; i < queryResultGoogleStack.size(); i++) {
-				tempSingleQueryResultGoogleStack = ScrapeDataWithKeywords.executeStackOverflowQuery(queryResultGoogleStack.get(i).get("id")).get(0);
+				ArrayList<Answer> noAnswerCheck = ScrapeDataWithKeywords.executeStackOverflowQuery(queryResultGoogleStack.get(i).get("id"));
+				if (noAnswerCheck.size() == 0) {
+					continue;
+				}
+				tempSingleQueryResultGoogleStack = noAnswerCheck.get(0);
 				AnswerWrapper aw = new AnswerWrapper(tempSingleQueryResultGoogleStack, 1.0 - (double) (i + 1) / queryResultGoogleStack.size());
 				finalStackOverflowResultsList.add(aw);
 				DCount++;
@@ -463,13 +467,13 @@ public class SearchAndRank {
 	}
 
 	public static void main(String[] args) {
-		StackExchangeApiClientFactory clientFactory = StackExchangeApiClientFactory.newInstance(null, StackExchangeSite.STACK_OVERFLOW);
-		StackExchangeApiClient client = clientFactory.createStackExchangeApiClient();
+		//StackExchangeApiClientFactory clientFactory = StackExchangeApiClientFactory.newInstance(null, StackExchangeSite.STACK_OVERFLOW);
+		//StackExchangeApiClient client = clientFactory.createStackExchangeApiClient();
 
-		HashMap<String, Integer> frequency = createTokenFrequency(client.getAnswers("WITHBODY", 24088081).get(0));
-		HashMap<String, Integer> frequency2 = createTokenFrequency(client.getAnswers("WITHBODY", 24696739).get(0));
+		//HashMap<String, Integer> frequency = createTokenFrequency(client.getAnswers("WITHBODY", 24088081).get(0));
+		//HashMap<String, Integer> frequency2 = createTokenFrequency(client.getAnswers("WITHBODY", 24696739).get(0));
 		
-		System.out.println(SearchAndRank.totalUniqueTokens.size());
+		//System.out.println(SearchAndRank.totalUniqueTokens.size());
 	}
 
 	public static String getQuestionTitle(long questionID) {
