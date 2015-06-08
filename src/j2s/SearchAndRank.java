@@ -3,11 +3,15 @@ package j2s;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.jsoup.Jsoup;
 
@@ -27,6 +31,9 @@ public class SearchAndRank {
 
 	public static ArrayList<String> totalUniqueTokens = new ArrayList<String>();
 	private static HashSet<String> filterKeys;
+	private static ArrayList<MetaData> finalList = new ArrayList<MetaData>();
+	//sortedFinalRanking is final list, take top k of those for returning to plugin
+	public static ArrayList<MetaData> sortedFinalRanking = new ArrayList<MetaData>();
 
 	static {
 		filterKeys = new HashSet<String>();
@@ -58,6 +65,7 @@ public class SearchAndRank {
 		initKeywordSet(searchKeywords);
 		search();
 		rank();
+		System.out.println("sorted and ranked, final list size is: " + sortedFinalRanking.size());
 	}
 
 	private static void initKeywordSet(ArrayList<String> searchKeywords) {
@@ -142,9 +150,7 @@ public class SearchAndRank {
 		// how those are stored
 		// that is done here and make new metadata objects as well
 
-		// final compare
-		// need to get cos score for each to query vector only (need to isolate
-		// query metadata object from rest with special answerid)
+
 		ArrayList<MetaData> finalList = new ArrayList<MetaData>();
 		Iterator it = metaDataList.entrySet().iterator();
 		while (it.hasNext()) {
@@ -155,17 +161,52 @@ public class SearchAndRank {
 		Collections.sort(finalList, new MetaDataComparator());
 		Collections.reverse(finalList);
 
-		// last thing here is get the cos value as said in above comment
-		// then combine (at 50/50 weight for now) this finallist with sorted
-		// list of cos values and return top 3 results
+		double[] cosines = new double[finalList.size()];
+		for (int i = 0; i < finalList.size(); i++) {
+			cosines[i] = GenerateSwiftQueryString.mdQuery.getCosValue(finalList.get(i));
+		}
+		normalize();
+		HashMap<Double, MetaData> finalRanking = new HashMap<Double, MetaData>();
+		for (int i = 0; i < finalList.size(); i++) {
+			cosines[i] = cosines[i] + finalList.get(i).getNormLinScore();
+			finalRanking.put(cosines[i], finalList.get(i));
+		}
+		List<Map.Entry<Double, MetaData>> list = new LinkedList<>(finalRanking.entrySet());
+		Collections.sort(list, new Comparator<Map.Entry<Double, MetaData>>() {
+			@Override
+			public int compare(Entry<Double, MetaData> arg0,
+					Entry<Double, MetaData> arg1) {
+				return (arg0.getKey()).compareTo(arg1.getKey());
+			}
+		});
+		Collections.reverse(list);
+		sortedFinalRanking = new ArrayList<MetaData>();
+		for (Map.Entry<Double, MetaData> entry : list) {
+			sortedFinalRanking.add(entry.getValue());
+		}
+	}
+	
+	private static void normalize() {
+		float max = 0;
+		for (int i = 0; i < finalList.size(); i++) {
+			if (finalList.get(i).getLinearScore() > max) {
+				max = finalList.get(i).getLinearScore();
+			}
+		}
+		for (int i = 0; i < finalList.size(); i++) {
+			finalList.get(i).setNormLinScore(finalList.get(i).getLinearScore()/max);
+		}
 	}
 
-	private static HashMap<String, Integer> createTokenFrequency(Answer a) {
+	public static HashMap<String, Integer> createTokenFrequency(Answer a) {
 
 		HashMap<String, Integer> frequency = new HashMap<String, Integer>();
 
 		String answerBody = a.getBody();
-		String questionTitle = getQuestionTitle(a.getQuestionId());
+		String questionTitle = "";
+		if (a.getTitle() == null || !a.getTitle().equals("ANTUAN_AND_SANCHIT")) {
+			questionTitle = getQuestionTitle(a.getQuestionId());
+		}
 		String input = questionTitle + " " + answerBody;
 
 		input = Jsoup.parse(input).text(); // Remove HTML tags

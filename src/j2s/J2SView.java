@@ -76,14 +76,10 @@ public class J2SView extends ViewPart {
 			ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
 			
 			SearchAndRank sar = new SearchAndRank(searchKeywords);
+			ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
 			
-			
-			// calls static class in submodule
-			// passes string from selection
-			// initiates processing
-			// asynchronus wait (generating suggestions...)
-			// "i'm feeling lucky" - create swift file straight away
-			// Regular return list of suggestions (3 or 5)
+			//rankedResults is final sorted list
+			//take rankedResults.get(0) for top choice, and so on
 		}
 
 		@Override

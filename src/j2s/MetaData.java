@@ -18,6 +18,7 @@ public class MetaData {
 	private long numFav;
 	private int numQueryAppear;
 	private double numInQuery;
+	private float normLinScore;
 
 	private static final HashMap<String, Float> FEATURE_WEIGHTS;
 	
@@ -112,6 +113,14 @@ public class MetaData {
 		total = total / (this.getMetaDataVectorNorm(self) * other.getMetaDataVectorNorm(out));
 		
 		return total;
+	}
+	
+	public void setNormLinScore(float score) {
+		this.normLinScore = score;
+	}
+	
+	public float getNormLinScore() {
+		return normLinScore;
 	}
 	
 	public HashSet<String> getTitleTokens() {

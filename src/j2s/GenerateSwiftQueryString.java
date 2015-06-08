@@ -14,11 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import com.google.code.stackexchange.schema.Answer;
+
 public class GenerateSwiftQueryString {
 
 	private static HashMap<String, Integer> frequency = new HashMap<String, Integer>();
 	private static HashSet<String> filterKeys;
-	private static final int NUM_FREQ_RETURN = 1;
+	private static final int NUM_FREQ_RETURN = 3;
+	private static String title = "";
+	public static MetaData mdQuery;
 
 	static {
 		filterKeys = new HashSet<String>();
@@ -48,12 +52,19 @@ public class GenerateSwiftQueryString {
 
 	public ArrayList<String> executeFrequencyAnalysis(String filepath) {
 		BufferedReader br = null;
+		boolean flag = true;
 		try {
 			String sCurrentLine;
 
 			br = new BufferedReader(new FileReader(filepath));
 			while ((sCurrentLine = br.readLine()) != null) {
 				if (!sCurrentLine.trim().equals("")) {
+					if (flag) {
+						if (sCurrentLine.startsWith("public") || sCurrentLine.startsWith("private")) {
+							flag = false;
+							title = sCurrentLine;
+						}
+					}
 					StringTokenizer st = new StringTokenizer(sCurrentLine);
 					while (st.hasMoreTokens()) {
 						parseToken(st.nextToken());
@@ -71,14 +82,42 @@ public class GenerateSwiftQueryString {
 			}
 		}
 
+		
 		filterFrequency();
-		frequency = new HashMap<String, Integer>();
 		ArrayList<String> result = sortByValue(frequency);
 		ArrayList<String> keywords = new ArrayList<String>();
 		for (int i = 0; i < NUM_FREQ_RETURN; i++) {
 			keywords.add(result.get(result.size()-i+1));
 		}
+		
+		generateQueryMetaDataObject();
+		frequency = new HashMap<String, Integer>();
+		
 		return keywords;
+	}
+	
+	private static void generateQueryMetaDataObject() {
+		String[] tokens = title.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)|(\\n)|(\\,)");
+		HashSet<String> titleTokens = new HashSet<String>();
+		for (int i = 0; i < tokens.length; i++) {
+			titleTokens.add(tokens[i].toLowerCase());
+		}
+		
+		mdQuery.setTitleTokens(titleTokens);
+
+		HashMap<String, Integer> tempFreq = new HashMap<String, Integer>();
+		String body = "";
+		ArrayList<String> freqKeys = new ArrayList<String>();
+		freqKeys.addAll(frequency.keySet());
+		for (int i = 0; i < freqKeys.size(); i++) {
+			body += freqKeys.get(i) + " ";
+		}
+		body.substring(0, body.length()-1);
+		Answer a = new Answer();
+		a.setBody(body);
+		a.setTitle("ANTUAN_AND_SANCHIT");
+		tempFreq = SearchAndRank.createTokenFrequency(a);
+		mdQuery.setFrequency(tempFreq);
 	}
 
 	public static ArrayList<String> sortByValue(HashMap<String, Integer> frequency) {
