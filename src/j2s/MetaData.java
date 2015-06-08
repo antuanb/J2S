@@ -78,18 +78,34 @@ public class MetaData {
 		for (int i = 0; i < SearchAndRank.totalUniqueTokens.size(); i++) {
 			String token = SearchAndRank.totalUniqueTokens.get(i);
 			if (frequency.containsKey(token)) {
-				if (getTitleTokens().contains(token)) {
+				/*if (getTitleTokens().contains(token)) {
 					sparseVector[i] = (float)FEATURE_WEIGHTS.get("titleToken") * frequency.get(i);
 				}
 				else {
 					sparseVector[i] = (float)frequency.get(i);
-				}
+				}*/
+				sparseVector[i] = getTF_IDF(frequency.get(token), token);
 			}
 			else {
 				sparseVector[i] = 0;
 			}
 		}
 		return sparseVector;
+	}
+	
+	public static float getTF_IDF(int freq, String token) {
+		int DCountIn = getDCountIn(token);
+		return (float) (freq * Math.log(SearchAndRank.DCount/DCountIn));
+	}
+	
+	public static int getDCountIn(String token) {
+		int DCountIn = 0;
+		for (int i = 0; i < SearchAndRank.DCount; i++) {
+			if (SearchAndRank.DSet.get(i).contains(token)) {
+				DCountIn++;
+			}
+		}
+		return DCountIn;
 	}
 	
 	//called after everything is done

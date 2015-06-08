@@ -117,6 +117,7 @@ public class GenerateSwiftQueryString {
 		a.setBody(body);
 		a.setTitle("ANTUAN_AND_SANCHIT");
 		tempFreq = SearchAndRank.createTokenFrequency(a);
+		SearchAndRank.DSet.add(tempFreq.keySet());
 		mdQuery.setFrequency(tempFreq);
 	}
 

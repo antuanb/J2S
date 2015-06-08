@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.jsoup.Jsoup;
 
@@ -34,6 +35,8 @@ public class SearchAndRank {
 	private static ArrayList<MetaData> finalList = new ArrayList<MetaData>();
 	//sortedFinalRanking is final list, take top k of those for returning to plugin
 	public static ArrayList<MetaData> sortedFinalRanking = new ArrayList<MetaData>();
+	public static int DCount = 1;
+	public static ArrayList<Set<String>> DSet = new ArrayList<Set<String>>();
 
 	static {
 		filterKeys = new HashSet<String>();
@@ -93,6 +96,7 @@ public class SearchAndRank {
 			for (int i = 0; i < queryResultStackOverflow.size(); i++) {
 				AnswerWrapper aw = new AnswerWrapper(queryResultStackOverflow.get(i), 1.0 - (double) (i + 1) / queryResultStackOverflow.size());
 				finalStackOverflowResultsList.add(aw);
+				DCount++;
 			}
 
 			queryResultGoogleStack = ScrapeDataWithKeywords.executeGoogleSearchQuery_Stack(keyword);
@@ -101,16 +105,17 @@ public class SearchAndRank {
 				tempSingleQueryResultGoogleStack = ScrapeDataWithKeywords.executeStackOverflowQuery(queryResultGoogleStack.get(i).get("id")).get(0);
 				AnswerWrapper aw = new AnswerWrapper(tempSingleQueryResultGoogleStack, 1.0 - (double) (i + 1) / queryResultGoogleStack.size());
 				finalStackOverflowResultsList.add(aw);
+				DCount++;
 			}
 
 			// make global static list of whatever item we use to store these
 			// non stackoverflow posts
 			// store not just the code but any feature information we can infer
 			// here
-			queryResultGoogleAll = ScrapeDataWithKeywords.executeGoogleSearchQuery_All(keyword);
-			for (int i = 0; i < queryResultGoogleAll.size(); i++) {
+			//queryResultGoogleAll = ScrapeDataWithKeywords.executeGoogleSearchQuery_All(keyword);
+			//for (int i = 0; i < queryResultGoogleAll.size(); i++) {
 				// do something with each all query result
-			}
+			//}
 		}
 
 	}
@@ -140,6 +145,7 @@ public class SearchAndRank {
 
 				HashMap<String, Integer> frequency = createTokenFrequency(aw.getAnswer());
 				md.setFrequency(frequency);
+				DSet.add(frequency.keySet());
 
 				metaDataList.put(aw.getAnswer().getAnswerId(), md);
 			} else {
