@@ -77,7 +77,8 @@ public class J2SView extends ViewPart {
 			
 			SearchAndRank sar = new SearchAndRank(searchKeywords);
 			ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
-			
+			System.out.println(rankedResults.get(0).getTitleTokens());
+			System.out.println(rankedResults.get(1).getTitleTokens());
 			//rankedResults is final sorted list
 			//take rankedResults.get(0) for top choice, and so on
 		}

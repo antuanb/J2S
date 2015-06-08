@@ -62,8 +62,11 @@ public class SearchAndRank {
 	}
 
 	public SearchAndRank(ArrayList<String> searchKeywords) {
+		System.out.println("start");
 		initKeywordSet(searchKeywords);
+		System.out.println("mid");
 		search();
+		System.out.println("search");
 		rank();
 		System.out.println("sorted and ranked, final list size is: " + sortedFinalRanking.size());
 	}

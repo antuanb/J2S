@@ -1,0 +1,30 @@
+	public static String getLocation(Context context) {
+		locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String bestProvider = locationManager.getBestProvider(criteria, false);
+        Location location = locationManager.getLastKnownLocation(bestProvider);
+        LocationListener loc_listener = new LocationListener() {
+
+            public void onLocationChanged(Location l) {}
+
+            public void onProviderEnabled(String p) {}
+
+            public void onProviderDisabled(String p) {}
+
+            public void onStatusChanged(String p, int status, Bundle extras) {}
+
+        };
+        locationManager
+                .requestLocationUpdates(bestProvider, 0, 0, loc_listener);
+        location = locationManager.getLastKnownLocation(bestProvider);
+        
+        try {
+        	locInfo[0] = "" + new DecimalFormat("#.#####").format(location.getLatitude());
+        	locInfo[1] = "" + new DecimalFormat("#.#####").format(location.getLongitude());
+        } catch (NullPointerException e) {
+        	locInfo[0] = "No GPS Available";
+        	return locInfo[0];
+        }
+        
+        return  locInfo[0] + ", " + locInfo[1];
+    }

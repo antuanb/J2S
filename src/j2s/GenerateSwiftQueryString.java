@@ -22,7 +22,7 @@ public class GenerateSwiftQueryString {
 	private static HashSet<String> filterKeys;
 	private static final int NUM_FREQ_RETURN = 3;
 	private static String title = "";
-	public static MetaData mdQuery;
+	public static MetaData mdQuery = new MetaData();
 
 	static {
 		filterKeys = new HashSet<String>();
@@ -87,7 +87,7 @@ public class GenerateSwiftQueryString {
 		ArrayList<String> result = sortByValue(frequency);
 		ArrayList<String> keywords = new ArrayList<String>();
 		for (int i = 0; i < NUM_FREQ_RETURN; i++) {
-			keywords.add(result.get(result.size()-i+1));
+			keywords.add(result.get(result.size()-i-1));
 		}
 		
 		generateQueryMetaDataObject();
