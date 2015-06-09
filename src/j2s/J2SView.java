@@ -3,6 +3,7 @@ package j2s;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
@@ -75,10 +76,22 @@ public class J2SView extends ViewPart {
 			GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
 			ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
 			System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());
-			SearchAndRank sar = new SearchAndRank(searchKeywords);
+			SearchAndRank sar = null;
+			try {
+				sar = new SearchAndRank(searchKeywords);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
-			System.out.println(rankedResults.get(0).getTitleTokens());
-			System.out.println(rankedResults.get(1).getTitleTokens());
+			System.out.println(rankedResults.get(0).getID());
+			System.out.println(rankedResults.get(0).printFields());
+			System.out.println(rankedResults.get(1).getID());
+			System.out.println(rankedResults.get(1).printFields());
+			//System.out.println(rankedResults.get(1).getTitleTokens());
 			//rankedResults is final sorted list
 			//take rankedResults.get(0) for top choice, and so on
 		}

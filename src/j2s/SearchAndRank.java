@@ -1,5 +1,11 @@
 package j2s;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,10 +39,13 @@ public class SearchAndRank {
 	public static ArrayList<String> totalUniqueTokens = new ArrayList<String>();
 	private static HashSet<String> filterKeys;
 	private static ArrayList<MetaData> finalList = new ArrayList<MetaData>();
-	//sortedFinalRanking is final list, take top k of those for returning to plugin
+	// sortedFinalRanking is final list, take top k of those for returning to
+	// plugin
 	public static ArrayList<MetaData> sortedFinalRanking = new ArrayList<MetaData>();
 	public static int DCount = 1;
 	public static ArrayList<Set<String>> DSet = new ArrayList<Set<String>>();
+
+	private static final boolean TEST_THROTTLE = true;
 
 	static {
 		filterKeys = new HashSet<String>();
@@ -64,14 +73,36 @@ public class SearchAndRank {
 		filterKeys.add("%");
 	}
 
-	public SearchAndRank(ArrayList<String> searchKeywords) {
+	public SearchAndRank(ArrayList<String> searchKeywords) throws IOException, ClassNotFoundException {
 		System.out.println("start");
 		initKeywordSet(searchKeywords);
 		System.out.println("mid");
 		search();
 		System.out.println("search");
+		writeObject();
+		System.out.println("writing");
 		rank();
-		System.out.println("sorted and ranked, final list size is: " + sortedFinalRanking.size());
+		System.out.println("sorted and ranked, final list size is: "
+				+ sortedFinalRanking.size());
+		System.out.println("finalStackOverflowResultsList size: "
+				+ finalStackOverflowResultsList.size());
+	}
+
+	private void writeObject() throws IOException {
+		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(
+				"finalStackOverflowResultsList.txt"));
+		oos.writeObject(finalStackOverflowResultsList);
+		oos.flush();
+		oos.close();
+		System.out.println(finalStackOverflowResultsList.size() + " size before");
+	}
+	
+	private void readObject() throws IOException, ClassNotFoundException {
+		ObjectInputStream ois = new ObjectInputStream(new FileInputStream("finalStackOverflowResultsList.txt"));
+		@SuppressWarnings("unchecked")
+		ArrayList<AnswerWrapper> list = (ArrayList<AnswerWrapper>) ois.readObject();
+		ois.close();
+		System.out.println(list.size() + " size after");
 	}
 
 	private static void initKeywordSet(ArrayList<String> searchKeywords) {
@@ -83,71 +114,112 @@ public class SearchAndRank {
 			fullKeywordSet.add(tempKeyword.get(i).trim());
 		}
 		if (searchKeywords.size() > 1) {
-			fullKeywordSet.add(searchKeywords.get(0) + " " + searchKeywords.get(1));
-			fullKeywordSet.add(searchKeywords.get(1) + " " + searchKeywords.get(0));
+			fullKeywordSet.add(searchKeywords.get(0) + " "
+					+ searchKeywords.get(1));
+			fullKeywordSet.add(searchKeywords.get(1) + " "
+					+ searchKeywords.get(0));
 		}
 	}
 
 	private void search() {
 		for (String keyword : fullKeywordSet) {
-			// store these results in something (meta data structure) and then
-			// pass all info to ranking
-			queryResultStackOverflow = ScrapeDataWithKeywords.executeStackOverflowQuery(keyword);
+			queryResultStackOverflow = ScrapeDataWithKeywords
+					.executeStackOverflowQuery(keyword);
 			for (int i = 0; i < queryResultStackOverflow.size(); i++) {
-				AnswerWrapper aw = new AnswerWrapper(queryResultStackOverflow.get(i), 1.0 - (double) (i + 1) / queryResultStackOverflow.size());
+				AnswerWrapper aw = new AnswerWrapper(
+						queryResultStackOverflow.get(i), 1.0 - (double) (i + 1)
+								/ queryResultStackOverflow.size());
 				finalStackOverflowResultsList.add(aw);
 				DCount++;
+				System.out.println("id: " + aw.getAnswer().getAnswerId());
+				System.out.println("viewcount: "
+						+ aw.getAnswer().getViewCount());
+				System.out.println("score: " + aw.getAnswer().getScore());
 			}
 
-			queryResultGoogleStack = ScrapeDataWithKeywords.executeGoogleSearchQuery_Stack(keyword);
+			queryResultGoogleStack = ScrapeDataWithKeywords
+					.executeGoogleSearchQuery_Stack(keyword);
+
+			if (TEST_THROTTLE) {
+				try {
+					Thread.sleep(60000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
 			Answer tempSingleQueryResultGoogleStack;
 			for (int i = 0; i < queryResultGoogleStack.size(); i++) {
-				ArrayList<Answer> noAnswerCheck = ScrapeDataWithKeywords.executeStackOverflowQuery(queryResultGoogleStack.get(i).get("id"));
+				ArrayList<Answer> noAnswerCheck = ScrapeDataWithKeywords
+						.executeStackOverflowQuery(queryResultGoogleStack
+								.get(i).get("id"));
 				if (noAnswerCheck.size() == 0) {
 					continue;
 				}
 				tempSingleQueryResultGoogleStack = noAnswerCheck.get(0);
-				AnswerWrapper aw = new AnswerWrapper(tempSingleQueryResultGoogleStack, 1.0 - (double) (i + 1) / queryResultGoogleStack.size());
+				AnswerWrapper aw = new AnswerWrapper(
+						tempSingleQueryResultGoogleStack, 1.0
+								- (double) (i + 1)
+								/ queryResultGoogleStack.size());
+				aw.getAnswer().setTitle(
+						queryResultGoogleStack.get(i).get("title"));
+				System.out.println("id: " + aw.getAnswer().getAnswerId());
+				System.out.println("viewcount: "
+						+ aw.getAnswer().getViewCount());
+				System.out.println("score: " + aw.getAnswer().getScore());
+				System.out.println(aw.getAnswer().getTitle() + " testingdis "
+						+ queryResultGoogleStack.get(i).get("title"));
 				finalStackOverflowResultsList.add(aw);
 				DCount++;
+
+				if (TEST_THROTTLE) {
+					try {
+						Thread.sleep(60000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 
 			// make global static list of whatever item we use to store these
 			// non stackoverflow posts
 			// store not just the code but any feature information we can infer
 			// here
-			//queryResultGoogleAll = ScrapeDataWithKeywords.executeGoogleSearchQuery_All(keyword);
-			//for (int i = 0; i < queryResultGoogleAll.size(); i++) {
-				// do something with each all query result
-			//}
+			// queryResultGoogleAll =
+			// ScrapeDataWithKeywords.executeGoogleSearchQuery_All(keyword);
+			// for (int i = 0; i < queryResultGoogleAll.size(); i++) {
+			// do something with each all query result
+			// }
 		}
 
 	}
 
 	private void rank() {
-		// use list of answer wrappers and whatever formation is setup for the
-		// non stackoverflow
-		// along with the ranks given by order to formulate the n-dimensional
-		// sphere
-		// then need to do all pairwise distances between query and answers
-		// report closest 3 to user
 		HashMap<Long, MetaData> metaDataList = new HashMap<Long, MetaData>();
 		HashSet<Long> uniques = new HashSet<Long>();
 
+		System.out.println("size of aw: "
+				+ finalStackOverflowResultsList.size());
 		for (AnswerWrapper aw : finalStackOverflowResultsList) {
+			System.out.println("inside rank: ");// aw.getAnswer().getTitle());
 			if (!uniques.contains(aw.getAnswer().getAnswerId())) {
 				uniques.add(aw.getAnswer().getAnswerId());
 				MetaData md = new MetaData();
+				md.setID(aw.getAnswer().getAnswerId());
 				md.setNumDownVotes(aw.getAnswer().getDownVoteCount());
 				md.setNumFav(aw.getAnswer().getFavoriteCount());
 				md.setNumInQuery(aw.getRank());
 				md.setNumViews(aw.getAnswer().getViewCount());
 				md.setNumVotes(aw.getAnswer().getUpVoteCount());
 
-				HashSet<String> titleTokens = createTitleTokens(aw.getAnswer().getTitle());
+				HashSet<String> titleTokens = createTitleTokens(aw.getAnswer()
+						.getTitle());
 				md.setTitleTokens(titleTokens);
 
-				HashMap<String, Integer> frequency = createTokenFrequency(aw.getAnswer());
+				HashMap<String, Integer> frequency = createTokenFrequency(aw
+						.getAnswer());
 				md.setFrequency(frequency);
 				DSet.add(frequency.keySet());
 
@@ -155,14 +227,14 @@ public class SearchAndRank {
 			} else {
 				// not sure if this is how java works?
 				// might not actually be setting this so need to test
-				metaDataList.get(aw.getAnswer().getAnswerId()).setNumQueryAppear();
+				metaDataList.get(aw.getAnswer().getAnswerId())
+						.setNumQueryAppear();
 			}
 		}
 
 		// need to do same stuff for the non stack overflow results once we know
 		// how those are stored
 		// that is done here and make new metadata objects as well
-
 
 		ArrayList<MetaData> finalList = new ArrayList<MetaData>();
 		Iterator it = metaDataList.entrySet().iterator();
@@ -176,7 +248,8 @@ public class SearchAndRank {
 
 		double[] cosines = new double[finalList.size()];
 		for (int i = 0; i < finalList.size(); i++) {
-			cosines[i] = GenerateSwiftQueryString.mdQuery.getCosValue(finalList.get(i));
+			cosines[i] = GenerateSwiftQueryString.mdQuery.getCosValue(finalList
+					.get(i));
 		}
 		normalize();
 		HashMap<Double, MetaData> finalRanking = new HashMap<Double, MetaData>();
@@ -184,7 +257,8 @@ public class SearchAndRank {
 			cosines[i] = cosines[i] + finalList.get(i).getNormLinScore();
 			finalRanking.put(cosines[i], finalList.get(i));
 		}
-		List<Map.Entry<Double, MetaData>> list = new LinkedList<>(finalRanking.entrySet());
+		List<Map.Entry<Double, MetaData>> list = new LinkedList<>(
+				finalRanking.entrySet());
 		Collections.sort(list, new Comparator<Map.Entry<Double, MetaData>>() {
 			@Override
 			public int compare(Entry<Double, MetaData> arg0,
@@ -198,7 +272,7 @@ public class SearchAndRank {
 			sortedFinalRanking.add(entry.getValue());
 		}
 	}
-	
+
 	private static void normalize() {
 		float max = 0;
 		for (int i = 0; i < finalList.size(); i++) {
@@ -207,7 +281,8 @@ public class SearchAndRank {
 			}
 		}
 		for (int i = 0; i < finalList.size(); i++) {
-			finalList.get(i).setNormLinScore(finalList.get(i).getLinearScore()/max);
+			finalList.get(i).setNormLinScore(
+					finalList.get(i).getLinearScore() / max);
 		}
 	}
 
@@ -225,7 +300,8 @@ public class SearchAndRank {
 		input = Jsoup.parse(input).text(); // Remove HTML tags
 
 		// Remove Comments
-		input = input.replaceAll("//.*|(\"(?:\\\\[^\"]|\\\\\"|.)*?\")|(?s)/\\*.*?\\*/", "$1 ");
+		input = input.replaceAll(
+				"//.*|(\"(?:\\\\[^\"]|\\\\\"|.)*?\")|(?s)/\\*.*?\\*/", "$1 ");
 
 		List<String> tokens = process(input); // Custom preprocessor by IBM
 
@@ -235,7 +311,8 @@ public class SearchAndRank {
 
 		for (String token : tempTokens) {
 			// camelCase, Class/method names etc
-			String[] codeTokens = token.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)|(\\n)|(\\,)|(\\@)");
+			String[] codeTokens = token
+					.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)|(\\n)|(\\,)|(\\@)");
 			finalTokens.addAll(Arrays.asList(codeTokens));
 		}
 
@@ -251,15 +328,18 @@ public class SearchAndRank {
 			}
 		}
 
-		ArrayList<String> uniqueLocalFrequencyList = GenerateSwiftQueryString.sortByValue(frequency);
+		ArrayList<String> uniqueLocalFrequencyList = GenerateSwiftQueryString
+				.sortByValue(frequency);
 		removeCorpusDuplicates(uniqueLocalFrequencyList);
 		totalUniqueTokens.addAll(uniqueLocalFrequencyList);
 
 		return frequency;
 	}
 
-	private static void removeCorpusDuplicates(ArrayList<String> uniqueLocalFrequencyList) {
-		ArrayList<String> tempList = new ArrayList<String>(uniqueLocalFrequencyList);
+	private static void removeCorpusDuplicates(
+			ArrayList<String> uniqueLocalFrequencyList) {
+		ArrayList<String> tempList = new ArrayList<String>(
+				uniqueLocalFrequencyList);
 		for (String token : tempList) {
 			if (totalUniqueTokens.contains(token)) {
 				uniqueLocalFrequencyList.remove(token);
@@ -307,7 +387,9 @@ public class SearchAndRank {
 				if (i + 5 < input.length()) {
 
 					// Pattern-1
-					if (Character.isLetter(arr[i]) && '.' == arr[i + 1] && Character.isLetter(arr[i + 2]) && '.' == arr[i + 3]
+					if (Character.isLetter(arr[i]) && '.' == arr[i + 1]
+							&& Character.isLetter(arr[i + 2])
+							&& '.' == arr[i + 3]
 							&& Character.isLetter(arr[i + 4])) {
 
 						for (; i < arr.length && arr[i] != ' '; i++) {
@@ -337,7 +419,8 @@ public class SearchAndRank {
 
 			// extract URLs
 			if ('h' == current && 't' == next) {
-				if (i + 7 < input.length() && "http://".equals(input.substring(i, i + 7))) {
+				if (i + 7 < input.length()
+						&& "http://".equals(input.substring(i, i + 7))) {
 
 					for (; i < arr.length && arr[i] != ' '; i++) {
 						sb.append(arr[i]);
@@ -352,7 +435,8 @@ public class SearchAndRank {
 			// extract windows drive letter paths
 			// c:/ or c:\
 			if (Character.isLetter(current) && ':' == next) {
-				if (i + 2 < input.length() && (arr[i + 2] == '\\' || arr[i + 2] == '/')) {
+				if (i + 2 < input.length()
+						&& (arr[i + 2] == '\\' || arr[i + 2] == '/')) {
 					sb.append(current);
 					sb.append(next);
 					sb.append(arr[i + 2]);
@@ -467,24 +551,35 @@ public class SearchAndRank {
 	}
 
 	public static void main(String[] args) {
-		//StackExchangeApiClientFactory clientFactory = StackExchangeApiClientFactory.newInstance(null, StackExchangeSite.STACK_OVERFLOW);
-		//StackExchangeApiClient client = clientFactory.createStackExchangeApiClient();
+		// StackExchangeApiClientFactory clientFactory =
+		// StackExchangeApiClientFactory.newInstance(null,
+		// StackExchangeSite.STACK_OVERFLOW);
+		// StackExchangeApiClient client =
+		// clientFactory.createStackExchangeApiClient();
 
-		//HashMap<String, Integer> frequency = createTokenFrequency(client.getAnswers("WITHBODY", 24088081).get(0));
-		//HashMap<String, Integer> frequency2 = createTokenFrequency(client.getAnswers("WITHBODY", 24696739).get(0));
-		
-		//System.out.println(SearchAndRank.totalUniqueTokens.size());
+		// HashMap<String, Integer> frequency =
+		// createTokenFrequency(client.getAnswers("WITHBODY", 24088081).get(0));
+		// HashMap<String, Integer> frequency2 =
+		// createTokenFrequency(client.getAnswers("WITHBODY", 24696739).get(0));
+
+		// System.out.println(SearchAndRank.totalUniqueTokens.size());
 	}
 
 	public static String getQuestionTitle(long questionID) {
-		StackExchangeApiClientFactory clientFactory = StackExchangeApiClientFactory.newInstance(null, StackExchangeSite.STACK_OVERFLOW);
-		StackExchangeApiClient client = clientFactory.createStackExchangeApiClient();
+		StackExchangeApiClientFactory clientFactory = StackExchangeApiClientFactory
+				.newInstance(null, StackExchangeSite.STACK_OVERFLOW);
+		StackExchangeApiClient client = clientFactory
+				.createStackExchangeApiClient();
 
 		return client.getQuestions(questionID).get(0).getTitle();
 	}
 
 	private HashSet<String> createTitleTokens(String title) {
 		HashSet<String> titleTokens = new HashSet<String>();
+		if (title == null) {
+			titleTokens.add(" ");
+			return titleTokens;
+		}
 		String[] tokens = title.split(" ");
 		for (String s : tokens) {
 			s = s.toLowerCase().trim();
@@ -518,7 +613,7 @@ public class SearchAndRank {
 		}
 	}
 
-	private class AnswerWrapper {
+	private class AnswerWrapper implements Serializable{
 		Answer answer;
 		double rank;
 

@@ -19,22 +19,25 @@ public class MetaData {
 	private int numQueryAppear;
 	private double numInQuery;
 	private float normLinScore;
+	private long id;
+	
+	public static ArrayList<Float> resultVector = new ArrayList<Float>();
 
 	private static final HashMap<String, Float> FEATURE_WEIGHTS;
 	
 	//TODO: ADD ACTUALLY CORRECT WEIGHT VALUES
 	static {
 		FEATURE_WEIGHTS = new HashMap<String, Float>();
-		FEATURE_WEIGHTS.put("frequency", (float)0);
-		FEATURE_WEIGHTS.put("title", (float)0);
-		FEATURE_WEIGHTS.put("numViews", (float)0);
-		FEATURE_WEIGHTS.put("isApprovedAnswer", (float)0);
-		FEATURE_WEIGHTS.put("numVotes", (float)0);
-		FEATURE_WEIGHTS.put("numDownVotes", (float)0);
-		FEATURE_WEIGHTS.put("numFav", (float)0);
-		FEATURE_WEIGHTS.put("numQueryAppear", (float)0);
-		FEATURE_WEIGHTS.put("numInQuery", (float)0);
-		FEATURE_WEIGHTS.put("titleToken", (float)0);
+		FEATURE_WEIGHTS.put("frequency", (float)1);
+		FEATURE_WEIGHTS.put("title", (float)1);
+		FEATURE_WEIGHTS.put("numViews", (float)1);
+		FEATURE_WEIGHTS.put("isApprovedAnswer", (float)1);
+		FEATURE_WEIGHTS.put("numVotes", (float)1);
+		FEATURE_WEIGHTS.put("numDownVotes", (float)1);
+		FEATURE_WEIGHTS.put("numFav", (float)1);
+		FEATURE_WEIGHTS.put("numQueryAppear", (float)1);
+		FEATURE_WEIGHTS.put("numInQuery", (float)1);
+		FEATURE_WEIGHTS.put("titleToken", (float)1);
 	}
 	
 	public MetaData() {
@@ -44,7 +47,7 @@ public class MetaData {
 	
 	//called after everything is done
 	public float getLinearScore() {
-		ArrayList<Float> resultVector = new ArrayList<Float>();
+		resultVector = new ArrayList<Float>();
 		resultVector.add((float)this.getNumFav() * FEATURE_WEIGHTS.get("numFav"));
 		resultVector.add((float)this.getNumDownVotes() * FEATURE_WEIGHTS.get("numDownVotes"));
 		resultVector.add((float)this.getNumVotes() * FEATURE_WEIGHTS.get("numVotes"));
@@ -100,7 +103,7 @@ public class MetaData {
 	
 	public static int getDCountIn(String token) {
 		int DCountIn = 0;
-		for (int i = 0; i < SearchAndRank.DCount; i++) {
+		for (int i = 0; i < SearchAndRank.DSet.size(); i++) {
 			if (SearchAndRank.DSet.get(i).contains(token)) {
 				DCountIn++;
 			}
@@ -129,6 +132,18 @@ public class MetaData {
 		total = total / (this.getMetaDataVectorNorm(self) * other.getMetaDataVectorNorm(out));
 		
 		return total;
+	}
+	
+	public String printFields() {
+		return resultVector.toString();		
+	}
+	
+	public void setID(long id) {
+		this.id = id;
+	}
+	
+	public long getID() {
+		return id;
 	}
 	
 	public void setNormLinScore(float score) {

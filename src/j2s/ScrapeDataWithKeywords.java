@@ -29,14 +29,9 @@ import com.googleapis.ajax.services.enumeration.ResultSetSize;
 
 public class ScrapeDataWithKeywords {
 
-	// TODO: need to decide on searches per keyword or all together
-	// need to figure out how to standardize returns from searches
-	// if doing non stackoverflow (like blogs or other info) how
-	// to strip away code and also how do we know importance?
-	// Can use questions vote count, view count, etc as features
+
 	public static ArrayList<Answer> executeStackOverflowQuery(String keywords) {
-		//StackExchangeApiQueryFactory queryFactory = StackExchangeApiQueryFactory.newInstance();
-		StackExchangeApiClientFactory clientFactory = StackExchangeApiClientFactory.newInstance(null, StackExchangeSite.STACK_OVERFLOW);
+		StackExchangeApiClientFactory clientFactory = StackExchangeApiClientFactory.newInstance("9etMjUnkWrL4v4fdd8ztkA((", StackExchangeSite.STACK_OVERFLOW);
 		StackExchangeApiClient client = clientFactory.createStackExchangeApiClient();
 		ArrayList<Answer> searchResult = new ArrayList<Answer>();
 		ArrayList<String> tags = new ArrayList<String>(Arrays.asList("ios", "swift"));
@@ -48,7 +43,6 @@ public class ScrapeDataWithKeywords {
 			return searchResult;
 		}
 		if (Character.isDigit(keywords.charAt(0))) {
-			//Question q = queryFactory.newAdvanceSearchApiQuery().withURL(keywords).withTags(tags).singleResult();
 			qId = Long.parseLong(keywords);
 			System.out.println("test");
 		} else {
@@ -60,7 +54,6 @@ public class ScrapeDataWithKeywords {
 				return searchResult;
 			}
 			searchResult.add(answers.get(0));
-			System.out.println(answers.get(0).getBody());
 			return searchResult;
 		}
 		for (Question q : questions) {
