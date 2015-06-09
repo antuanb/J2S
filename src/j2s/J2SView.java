@@ -57,8 +57,8 @@ public class J2SView extends ViewPart {
 		public void widgetSelected(SelectionEvent arg0) {
 			label.setForeground(new Color (Display.getCurrent (), 255, 0, 0));
 			
-			String filename = "C:\\Users\\Antuan\\Downloads\\methodSelection.txt";
-//			String filename = System.getProperty("user.home") + "/Downloads/methodSelection.txt";
+//			String filename = "C:\\Users\\Antuan\\Downloads\\methodSelection.txt";
+			String filename = System.getProperty("user.home") + "/Downloads/methodSelection.txt";
 			File file = new File(filename);
 			file.setReadable(true);
 			file.setWritable(true);
@@ -72,7 +72,6 @@ public class J2SView extends ViewPart {
 			}
 			writer.print(selectedText);
 			writer.close();
-			
 			GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
 			ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
 			System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());
@@ -102,6 +101,28 @@ public class J2SView extends ViewPart {
 			
 		}
 	};
+	
+	public static void main(String[] args) {
+		String filename = System.getProperty("user.home") + "/Downloads/methodSelection.txt";
+		GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
+		ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
+		System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());
+		SearchAndRank sar = null;
+		try {
+			sar = new SearchAndRank(searchKeywords);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
+		System.out.println(rankedResults.get(0).getID());
+		System.out.println(rankedResults.get(0).printFields());
+		System.out.println(rankedResults.get(1).getID());
+		System.out.println(rankedResults.get(1).printFields());
+	}
 	
 	private ISelectionListener selectionListener = new ISelectionListener() {
         public void selectionChanged(IWorkbenchPart sourcepart, ISelection selection) {

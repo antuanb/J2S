@@ -201,9 +201,9 @@ public class GenerateSwiftQueryString {
 		if (t.endsWith("ing")) {
 			token = t.substring(0, t.length() - 3);
 		}
-		if (t.endsWith("ed") || t.endsWith("ly")) {
-			token = t.substring(0, t.length() - 2);
-		}
+//		if (t.endsWith("ed") || t.endsWith("ly")) {
+//			token = t.substring(0, t.length() - 2);
+//		}
 		return token;
 	}
 

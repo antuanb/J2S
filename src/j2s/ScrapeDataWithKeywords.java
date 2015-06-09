@@ -28,43 +28,54 @@ import com.googleapis.ajax.services.WebSearchQuery;
 import com.googleapis.ajax.services.enumeration.ResultSetSize;
 
 public class ScrapeDataWithKeywords {
+	
+	public static final String AUTH_KEY = "9etMjUnkWrL4v4fdd8ztkA((";
 
-
-	public static ArrayList<Answer> executeStackOverflowQuery(String keywords) {
-		StackExchangeApiClientFactory clientFactory = StackExchangeApiClientFactory.newInstance("9etMjUnkWrL4v4fdd8ztkA((", StackExchangeSite.STACK_OVERFLOW);
+	public static ArrayList<HashMap<Answer,Question>> executeStackOverflowQuery(String keywords) {
+		StackExchangeApiClientFactory clientFactory = StackExchangeApiClientFactory.newInstance(AUTH_KEY, StackExchangeSite.STACK_OVERFLOW);
 		StackExchangeApiClient client = clientFactory.createStackExchangeApiClient();
-		ArrayList<Answer> searchResult = new ArrayList<Answer>();
+		
+		HashMap<Answer, Question> searchResult = new HashMap<Answer,Question>();
+		ArrayList<HashMap<Answer, Question>> searchResults = new ArrayList<HashMap<Answer, Question>>();
+		
 		ArrayList<String> tags = new ArrayList<String>(Arrays.asList("ios", "swift"));
 		
 		PagedList<Question> questions = null;
 		
 		long qId = -1;
 		if (keywords == null) {
-			return searchResult;
+			return searchResults;
 		}
 		if (Character.isDigit(keywords.charAt(0))) {
 			qId = Long.parseLong(keywords);
 			System.out.println("test");
 		} else {
 			questions = client.searchQuestions(keywords, tags, null, QuestionSortOrder.MOST_RELEVANT, null);
+//			questions = client.searchQuestions(keywords);
+			System.out.println("QUESTIONS SIZE: " + questions.size());
 		}
 		if (qId != -1) {
+			PagedList<Question> question = client.getQuestions(qId);
 			PagedList<Answer> answers = client.getAnswersByQuestions(SortOrder.MOST_VOTED, "WITHBODY", qId);
+			
 			if (answers.size() == 0) {
-				return searchResult;
+				return searchResults;
 			}
-			searchResult.add(answers.get(0));
-			return searchResult;
+			searchResult.put(answers.get(0), question.get(0));
+			searchResults.add(searchResult);
+			return searchResults;
 		}
 		for (Question q : questions) {
 			PagedList<Answer> answers = client.getAnswersByQuestions(SortOrder.MOST_VOTED, "WITHBODY", q.getQuestionId());
 			if (answers.size() == 0) {
 				continue;
 			}
-			searchResult.add(answers.get(0));
+			searchResult = new HashMap<Answer,Question>();
+			searchResult.put(answers.get(0), q);
+			searchResults.add(searchResult);
 		}
 
-		return searchResult;
+		return searchResults;
 	}
 
 	public static ArrayList<HashMap<String, String>> executeGoogleSearchQuery_Stack(
@@ -77,8 +88,8 @@ public class ScrapeDataWithKeywords {
 				.withQuery(keywords + "swift website:www.stackoverflow.com")
 				.list();
 		ArrayList<HashMap<String, String>> googleSearchResults = new ArrayList<HashMap<String, String>>();
-		HashMap<String, String> googleSearchResult = new HashMap<String, String>();
 		for (WebResult result : response) {
+			HashMap<String, String> googleSearchResult = new HashMap<String, String>();
 			if (result.getUrl().startsWith("http://stackoverflow.com/questions/")) {
 				Pattern p = Pattern.compile("^[^\\d]*(\\d+)");
 				Matcher m = p.matcher(result.getUrl());

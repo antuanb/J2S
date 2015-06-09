@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class ReflectionEvaluation {
 	public static void main(String[] args) {
-		// tester();
+		// tester(); 
 		System.out.println(equals_Wrapper(""));
 		System.out.println(toString_Wrapper());
 		System.out.println(compareTo_Wrapper(""));
