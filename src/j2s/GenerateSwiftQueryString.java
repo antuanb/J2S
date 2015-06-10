@@ -48,6 +48,8 @@ public class GenerateSwiftQueryString {
 		filterKeys.add("\\");
 		filterKeys.add("\"");
 		filterKeys.add("%");
+		filterKeys.add("*");
+		filterKeys.add("/");
 	}
 
 	public ArrayList<String> executeFrequencyAnalysis(String filepath) {
@@ -65,10 +67,15 @@ public class GenerateSwiftQueryString {
 							title = sCurrentLine;
 						}
 					}
-					StringTokenizer st = new StringTokenizer(sCurrentLine);
-					while (st.hasMoreTokens()) {
-						parseToken(st.nextToken());
+					sCurrentLine = sCurrentLine.replaceAll("//.*|(\"(?:\\\\[^\"]|\\\\\"|.)*?\")|(?s)/\\*.*?\\*/", "$1 ");
+					List<String> tokens = SearchAndRank.process(sCurrentLine);
+					for (String token : tokens) {
+						parseToken(token);
 					}
+//					StringTokenizer st = new StringTokenizer(sCurrentLine);
+//					while (st.hasMoreTokens()) {
+//						parseToken(st.nextToken());
+//					}
 				}
 			}
 		} catch (IOException e) {
@@ -143,6 +150,8 @@ public class GenerateSwiftQueryString {
 			fullResult.put(entry.getKey(), entry.getValue());
 		}
 		
+		System.out.println("FULL RESULT: " + fullResult.toString());
+		
 		List<String> keySetFrequency = new LinkedList<String>();
 		keySetFrequency.addAll(fullResult.keySet());
 		List<Integer> valueSetFrequency = new LinkedList<Integer>();
@@ -191,7 +200,9 @@ public class GenerateSwiftQueryString {
 	private static void filterFrequency() {
 		for (String key : filterKeys) {
 			if (frequency.containsKey(key)) {
-				frequency.remove(key);
+				while (frequency.remove(key) != null) {
+
+				}
 			}
 		}
 	}
@@ -205,12 +216,12 @@ public class GenerateSwiftQueryString {
 	}
 
 	private static void parseToken(String token) {
-		String[] tokens = token.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)|(\\n)|(\\,)");
+		String[] tokens = token.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)|(\\n)|(\\,)|(\\@)");
 		for (int i = 0; i < tokens.length; i++) {
 			tokens[i] = tokens[i].toLowerCase();
 		}
 		for (String t : tokens) {
-			t = applyStemming(t);
+//			t = applyStemming(t);
 			if (frequency.containsKey(t)) {
 				frequency.put(t, frequency.get(t) + 1);
 			} else {

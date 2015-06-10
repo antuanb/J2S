@@ -103,31 +103,31 @@ public class J2SView extends ViewPart {
 	};
 	
 	public static void main(String[] args) {
-		//String filename = System.getProperty("user.home") + "/Downloads/methodSelection.txt";
-		String filename = "C:\\Users\\Antuan\\Downloads\\methodSelection.txt";
+		String filename = System.getProperty("user.home") + "/Downloads/methodSelection.txt";
+//		String filename = "C:\\Users\\Antuan\\Downloads\\methodSelection.txt";
 		GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
 		ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
 		System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());
-		SearchAndRank sar = null;
-		try {
-			sar = new SearchAndRank(searchKeywords);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
-		for (int i = 0; i < rankedResults.size(); i++) {
-			System.out.println(rankedResults.get(i).getID());
-			System.out.println(rankedResults.get(i).printFields());
-			System.out.println(rankedResults.get(i).getCosValueFinal());
-			System.out.println(rankedResults.get(i).getNormLinScore());
-			System.out.println(rankedResults.get(i).getFinalRankingScore());
-		}
-		System.out.println("Number 1 ranked answer body is: ");
-		System.out.println(rankedResults.get(0).getAnswerBody().toString());
+//		SearchAndRank sar = null;
+//		try {
+//			sar = new SearchAndRank(searchKeywords);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (ClassNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
+//		for (int i = 0; i < rankedResults.size(); i++) {
+//			System.out.println(rankedResults.get(i).getID());
+//			System.out.println(rankedResults.get(i).printFields());
+//			System.out.println(rankedResults.get(i).getCosValueFinal());
+//			System.out.println(rankedResults.get(i).getNormLinScore());
+//			System.out.println(rankedResults.get(i).getFinalRankingScore());
+//		}
+//		System.out.println("Number 1 ranked answer body is: ");
+//		System.out.println(rankedResults.get(0).getAnswerBody().toString());
 	}
 	
 	private ISelectionListener selectionListener = new ISelectionListener() {
