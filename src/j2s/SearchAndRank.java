@@ -40,11 +40,12 @@ public class SearchAndRank {
 	public static ArrayList<String> totalUniqueTokens = new ArrayList<String>();
 	private static HashSet<String> filterKeys;
 	private static ArrayList<MetaData> finalList = new ArrayList<MetaData>();
-	// sortedFinalRanking is final list, take top k of those for returning to
-	// plugin
+
 	public static ArrayList<MetaData> sortedFinalRanking = new ArrayList<MetaData>();
 	public static int DCount = 1;
 	public static ArrayList<Set<String>> DSet = new ArrayList<Set<String>>();
+	private static final double alpha = 0.6;
+	private static final double beta = 0.4;
 
 	private static final boolean TEST_THROTTLE = false;
 
@@ -131,16 +132,11 @@ public class SearchAndRank {
 
 				Iterator<Answer> answerIterator = queryResultStackOverflow.get(i).keySet().iterator();
 				Answer answer = answerIterator.next();
+				Question question = queryResultStackOverflow.get(i).get(answer);		
 
-				AnswerWrapper aw = new AnswerWrapper(queryResultStackOverflow.get(i).get(answer), answer, 1.0 - (double) (i + 1)
+				AnswerWrapper aw = new AnswerWrapper(question, answer, 1.0 - (double) (i + 1)
 						/ queryResultStackOverflow.size());
 				finalStackOverflowResultsList.add(aw);
-				DCount++;
-				System.out.println("Question id: " + aw.getQuestion().getQuestionId());
-				System.out.println("Question views: " + aw.getQuestion().getViewCount());
-				System.out.println("id: " + aw.getAnswer().getAnswerId());
-				System.out.println("viewcount: " + aw.getAnswer().getViewCount());
-				System.out.println("score: " + aw.getAnswer().getScore());
 			}
 
 			queryResultGoogleStack = ScrapeDataWithKeywords.executeGoogleSearchQuery_Stack(keyword);
@@ -149,7 +145,6 @@ public class SearchAndRank {
 				try {
 					Thread.sleep(60000);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -166,17 +161,24 @@ public class SearchAndRank {
 					Answer answer = answerIterator.next();
 					Question question = noAnswerCheck.get(j).get(answer);
 
-					// tempSingleQueryResultGoogleStack = noAnswerCheck.get(0);
 					AnswerWrapper aw = new AnswerWrapper(question, answer, 1.0 - (double) (j + 1) / queryResultGoogleStack.size());
 					aw.getAnswer().setTitle(question.getTitle());
-					System.out.println("Question id: " + aw.getQuestion().getQuestionId());
-					System.out.println("Question views: " + aw.getQuestion().getViewCount());
-					System.out.println("id: " + aw.getAnswer().getAnswerId());
-					System.out.println("viewcount: " + aw.getAnswer().getViewCount());
+
+					//debug purposes
+					/*
+					System.out.println("a id: " + aw.getQuestion().getQuestionId());
+					System.out.println("a id: " + aw.getAnswer().getAnswerId());
+					System.out.println("A: viewcount: " + aw.getAnswer().getViewCount());
+					System.out.println("Q: viewcount: " + aw.getQuestion().getViewCount());
 					System.out.println("score: " + aw.getAnswer().getScore());
 					System.out.println("title: " + aw.getAnswer().getTitle());
+					System.out.println("q score: " + aw.getQuestion().getScore());
+					System.out.println("q fav: " + aw.getQuestion().getFavoriteCount());
+					System.out.println("q upvote: " + aw.getQuestion().getUpVoteCount());
+					System.out.println("a downvote: " + aw.getAnswer().getDownVoteCount());
+					System.out.println("a fav " + aw.getAnswer().getFavoriteCount());
+					*/
 					finalStackOverflowResultsList.add(aw);
-					DCount++;
 				}
 				if (TEST_THROTTLE) {
 					try {
@@ -204,12 +206,13 @@ public class SearchAndRank {
 	private void rank() {
 		HashMap<Long, MetaData> metaDataList = new HashMap<Long, MetaData>();
 		HashSet<Long> uniques = new HashSet<Long>();
-
+		DSet.add(GenerateSwiftQueryString.mdQuery.getFrequency().keySet());
 		System.out.println("size of aw: " + finalStackOverflowResultsList.size());
 		for (AnswerWrapper aw : finalStackOverflowResultsList) {
-			System.out.println("inside rank: ");// aw.getAnswer().getTitle());
 			if (!uniques.contains(aw.getAnswer().getAnswerId())) {
+							
 				uniques.add(aw.getAnswer().getAnswerId());
+				
 				MetaData md = new MetaData();
 				md.setID(aw.getAnswer().getAnswerId());
 				md.setNumDownVotes(aw.getAnswer().getDownVoteCount());
@@ -217,6 +220,15 @@ public class SearchAndRank {
 				md.setNumInQuery(aw.getRank());
 				md.setNumViews(aw.getAnswer().getViewCount());
 				md.setNumVotes(aw.getAnswer().getScore());
+				md.setApprovedAnswer(aw.getAnswer().isAccepted());
+				md.setAnswerBody(aw.getAnswer().getBody());
+				
+				//fields from question
+				md.setQuestionFavoriteCount(aw.getQuestion().getFavoriteCount());
+				md.setQuestionScore(aw.getQuestion().getScore());
+				md.setQuestionTitle(aw.getQuestion().getTitle());
+				md.setQuestionUpVoteCount(aw.getQuestion().getUpVoteCount());
+				md.setQuestionViewCount(aw.getQuestion().getViewCount());
 
 				HashSet<String> titleTokens = createTitleTokens(aw.getAnswer().getTitle());
 				md.setTitleTokens(titleTokens);
@@ -224,11 +236,12 @@ public class SearchAndRank {
 				HashMap<String, Integer> frequency = createTokenFrequency(aw.getAnswer());
 				md.setFrequency(frequency);
 				DSet.add(frequency.keySet());
-
+				DCount++;
 				metaDataList.put(aw.getAnswer().getAnswerId(), md);
 			} else {
 				// not sure if this is how java works?
 				// might not actually be setting this so need to test
+				System.out.println("Ever call this?");
 				metaDataList.get(aw.getAnswer().getAnswerId()).setNumQueryAppear();
 			}
 		}
@@ -237,7 +250,6 @@ public class SearchAndRank {
 		// how those are stored
 		// that is done here and make new metadata objects as well
 
-		ArrayList<MetaData> finalList = new ArrayList<MetaData>();
 		Iterator it = metaDataList.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry pair = (Map.Entry) it.next();
@@ -250,12 +262,14 @@ public class SearchAndRank {
 		double[] cosines = new double[finalList.size()];
 		for (int i = 0; i < finalList.size(); i++) {
 			cosines[i] = GenerateSwiftQueryString.mdQuery.getCosValue(finalList.get(i));
+			finalList.get(i).setCosValueFinal(cosines[i]);
 		}
-		normalize();
+		cosines = normalize(cosines);
 		HashMap<Double, MetaData> finalRanking = new HashMap<Double, MetaData>();
 		for (int i = 0; i < finalList.size(); i++) {
-			cosines[i] = cosines[i] + finalList.get(i).getNormLinScore();
+			cosines[i] = (alpha * cosines[i]) + (beta * finalList.get(i).getNormLinScore());
 			finalRanking.put(cosines[i], finalList.get(i));
+			finalList.get(i).setFinalRankingScore(cosines[i]);
 		}
 		List<Map.Entry<Double, MetaData>> list = new LinkedList<>(finalRanking.entrySet());
 		Collections.sort(list, new Comparator<Map.Entry<Double, MetaData>>() {
@@ -271,8 +285,9 @@ public class SearchAndRank {
 		}
 	}
 
-	private static void normalize() {
+	private static double[] normalize(double[] cosines) {
 		float max = 0;
+		System.out.println(finalList.size());
 		for (int i = 0; i < finalList.size(); i++) {
 			if (finalList.get(i).getLinearScore() > max) {
 				max = finalList.get(i).getLinearScore();
@@ -281,6 +296,17 @@ public class SearchAndRank {
 		for (int i = 0; i < finalList.size(); i++) {
 			finalList.get(i).setNormLinScore(finalList.get(i).getLinearScore() / max);
 		}
+		double maxCos = -1.0;
+		double[] newCosines = new double[cosines.length];
+		for (int i = 0; i < cosines.length; i++) {
+			if (cosines[i] > maxCos) {
+				maxCos = cosines[i];
+			}
+		}
+		for (int i = 0; i < cosines.length; i++) {
+			newCosines[i] = cosines[i]/maxCos;
+		}
+		return newCosines;
 	}
 
 	public static HashMap<String, Integer> createTokenFrequency(Answer a) {
@@ -624,7 +650,7 @@ public class SearchAndRank {
 		}
 
 		public String toString() {
-			return "" + this.answer.getAnswerId();
+			return "" + this.answer.getAnswerId() + ", " + this.question.getQuestionId();
 		}
 	}
 }

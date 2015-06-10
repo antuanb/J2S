@@ -7,6 +7,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * @author Antuan
+ *
+ */
 public class MetaData {
 	
 	private HashMap<String, Integer> frequency;
@@ -20,32 +24,47 @@ public class MetaData {
 	private double numInQuery;
 	private float normLinScore;
 	private long id;
-	
-	public static ArrayList<Float> resultVector = new ArrayList<Float>();
+	private long questionFavoriteCount;
+	private long questionScore;
+	private String questionTitle;
+	private long questionUpVoteCount;
+	private long questionViewCount;
+	private double cosValueFinal;
+	private double finalRankingScore;
+	private String answerBody;
+	private ArrayList<Float> resultVector = new ArrayList<Float>();
 
+	//static feature weights for linear scoring
 	private static final HashMap<String, Float> FEATURE_WEIGHTS;
-	
-	//TODO: ADD ACTUALLY CORRECT WEIGHT VALUES
 	static {
 		FEATURE_WEIGHTS = new HashMap<String, Float>();
 		FEATURE_WEIGHTS.put("frequency", (float)1);
 		FEATURE_WEIGHTS.put("title", (float)1);
-		FEATURE_WEIGHTS.put("numViews", (float)1);
-		FEATURE_WEIGHTS.put("isApprovedAnswer", (float)1);
-		FEATURE_WEIGHTS.put("numVotes", (float)1);
-		FEATURE_WEIGHTS.put("numDownVotes", (float)1);
-		FEATURE_WEIGHTS.put("numFav", (float)1);
-		FEATURE_WEIGHTS.put("numQueryAppear", (float)1);
-		FEATURE_WEIGHTS.put("numInQuery", (float)1);
+		FEATURE_WEIGHTS.put("numViews", (float)2);
+		FEATURE_WEIGHTS.put("isApprovedAnswer", (float)2);
+		FEATURE_WEIGHTS.put("numVotes", (float)2);
+		FEATURE_WEIGHTS.put("numDownVotes", (float)-1);
+		FEATURE_WEIGHTS.put("numFav", (float)2);
+		FEATURE_WEIGHTS.put("numQueryAppear", (float)2);
+		FEATURE_WEIGHTS.put("numInQuery", (float)2);
 		FEATURE_WEIGHTS.put("titleToken", (float)1);
+		FEATURE_WEIGHTS.put("qFav", (float)1);
+		FEATURE_WEIGHTS.put("qScore", (float)2);
+		FEATURE_WEIGHTS.put("qUp", (float)1);
+		FEATURE_WEIGHTS.put("qView", (float)2);
 	}
 	
 	public MetaData() {
-		//whatever fields end up being in constructor
+		//queries appear by default at least once
 		numQueryAppear = 1;
 	}
 	
-	//called after everything is done
+	/*
+	 * Calculates the linear score for linear combinations model
+	 * 
+	 * @ENTRY_POINT from outside class
+	 * @return linear combination of the model score
+	 */
 	public float getLinearScore() {
 		resultVector = new ArrayList<Float>();
 		resultVector.add((float)this.getNumFav() * FEATURE_WEIGHTS.get("numFav"));
@@ -54,40 +73,45 @@ public class MetaData {
 		resultVector.add((float)this.getNumViews() * FEATURE_WEIGHTS.get("numViews"));
 		resultVector.add((float)this.getNumQueryAppear() * FEATURE_WEIGHTS.get("numQueryAppear"));
 		resultVector.add((float)this.getNumInQuery() * FEATURE_WEIGHTS.get("numInQuery"));
-		
-		//if can get this from answer or another way add into linear model
-		/*
+		resultVector.add((float)this.getQuestionFavoriteCount() * FEATURE_WEIGHTS.get("qFav"));
+		resultVector.add((float)this.getQuestionScore() * FEATURE_WEIGHTS.get("qScore"));
+		resultVector.add((float)this.getQuestionUpVoteCount() * FEATURE_WEIGHTS.get("qUp"));
+		resultVector.add((float)this.getQuestionViewCount() * FEATURE_WEIGHTS.get("qView"));
 		if (this.isApprovedAnswer()) {
-			resultVector.add(1.0 * FEATURE_WEIGHTS.get("isApprovedAnswer"));
+			resultVector.add((float) (1.0 * FEATURE_WEIGHTS.get("isApprovedAnswer")));
 		}
 		else {
-			resultVector.add(0.0 * FEATURE_WEIGHTS.get("isApprovedAnswer"));
+			resultVector.add((float)(0.0));
 		}
-		*/
 		
-		//leaving as arraylist in case need values passed before summation
+		//return linear combination score
 		float totalScore = (float)0;
-		for (double d : resultVector) {
+		for (float d : resultVector) {
 			totalScore += d;		
 		}
 		return totalScore;
 	}
 	
-	//called after everything is done
+	/*
+	 * Calculates the sparse vector associated with a metadata object based
+	 * on the tf-idf weights. Called by other metadata objects and itself
+	 * 
+	 * @ENTRY_POINT
+	 * @return sparse metadata n-dimensional vector
+	 */
 	public float[] getMetaDataVector() {
-		
-		//TODO: need to implement tf-idf weighting for these weights
 		float[] sparseVector = new float[SearchAndRank.totalUniqueTokens.size()];
+		//for all tokens if present, get weight and add, otherwise 0
 		for (int i = 0; i < SearchAndRank.totalUniqueTokens.size(); i++) {
 			String token = SearchAndRank.totalUniqueTokens.get(i);
 			if (frequency.containsKey(token)) {
-				/*if (getTitleTokens().contains(token)) {
-					sparseVector[i] = (float)FEATURE_WEIGHTS.get("titleToken") * frequency.get(i);
+				//add extra weight to title tokens
+				if (getTitleTokens().contains(token)) {
+					sparseVector[i] = getTF_IDF(frequency.get(token), token, true);
 				}
 				else {
-					sparseVector[i] = (float)frequency.get(i);
-				}*/
-				sparseVector[i] = getTF_IDF(frequency.get(token), token);
+					sparseVector[i] = getTF_IDF(frequency.get(token), token, false);
+				}
 			}
 			else {
 				sparseVector[i] = 0;
@@ -96,12 +120,23 @@ public class MetaData {
 		return sparseVector;
 	}
 	
-	public static float getTF_IDF(int freq, String token) {
+	/*
+	 * using global and local frequency across this document
+	 * and all documents to calculate the tf-idf weights
+	 */
+	private float getTF_IDF(int freq, String token, boolean isTitle) {
 		int DCountIn = getDCountIn(token);
-		return (float) (freq * Math.log(SearchAndRank.DCount/DCountIn));
+		int newFreq = freq;
+		if (isTitle) {
+			newFreq++;
+		}
+		return (float) (newFreq * Math.log(SearchAndRank.DCount/DCountIn));
 	}
 	
-	public static int getDCountIn(String token) {
+	/*
+	 * helper function for documents containing a term
+	 */
+	private int getDCountIn(String token) {
 		int DCountIn = 0;
 		for (int i = 0; i < SearchAndRank.DSet.size(); i++) {
 			if (SearchAndRank.DSet.get(i).contains(token)) {
@@ -111,7 +146,13 @@ public class MetaData {
 		return DCountIn;
 	}
 	
-	//called after everything is done
+
+	/*
+	 * Get the norm of a vector, in L2 format for cosine calculation
+	 * 
+	 * @ENTRY_POINT
+	 * @return scalar of the L2 norm
+	 */
 	public double getMetaDataVectorNorm(float[] vector) {
 		double total = 0.0;
 		for (int i = 0; i < vector.length; i++) {
@@ -120,7 +161,12 @@ public class MetaData {
 		return Math.sqrt(total);
 	}
 	
-	//final result for comparison that is called outside of this class in searchandrank
+	/*
+	 * Gets the final cosine value between this document and a given other document
+	 * 
+	 * @ENTRY_POINT
+	 * @return cosine between two vectors
+	 */
 	public double getCosValue(MetaData other) {
 		double total = 0.0;
 		float[] self = this.getMetaDataVector();
@@ -128,11 +174,86 @@ public class MetaData {
 		for (int i = 0; i < SearchAndRank.totalUniqueTokens.size(); i++) {
 			total += (self[i] * out[i]);
 		}
-		
 		total = total / (this.getMetaDataVectorNorm(self) * other.getMetaDataVectorNorm(out));
-		
 		return total;
 	}
+	
+	public String getAnswerBody() {
+		return answerBody;
+	}
+
+	public void setAnswerBody(String answerBody) {
+		this.answerBody = answerBody;
+	}
+
+	public double getFinalRankingScore() {
+		return finalRankingScore;
+	}
+
+	public void setFinalRankingScore(double finalRankingScore) {
+		this.finalRankingScore = finalRankingScore;
+	}
+
+	public ArrayList<Float> getResultVector() {
+		return resultVector;
+	}
+
+	public void setResultVector(ArrayList<Float> resultVector) {
+		this.resultVector = resultVector;
+	}
+
+	public double getCosValueFinal() {
+		return cosValueFinal;
+	}
+
+	public void setCosValueFinal(double cosValueFinal) {
+		this.cosValueFinal = cosValueFinal;
+	}
+	
+	public long getQuestionFavoriteCount() {
+		return questionFavoriteCount;
+	}
+
+	public void setQuestionFavoriteCount(long questionFavoriteCount) {
+		this.questionFavoriteCount = questionFavoriteCount;
+	}
+
+	public long getQuestionScore() {
+		return questionScore;
+	}
+
+	public void setQuestionScore(long questionScore) {
+		this.questionScore = questionScore;
+	}
+
+	public String getQuestionTitle() {
+		return questionTitle;
+	}
+
+	public void setQuestionTitle(String questionTitle) {
+		this.questionTitle = questionTitle;
+	}
+
+	public long getQuestionUpVoteCount() {
+		return questionUpVoteCount;
+	}
+
+	public void setQuestionUpVoteCount(long questionUpVoteCount) {
+		this.questionUpVoteCount = questionUpVoteCount;
+	}
+
+	public long getQuestionViewCount() {
+		return questionViewCount;
+	}
+
+	public void setQuestionViewCount(long questionViewCount) {
+		this.questionViewCount = questionViewCount;
+	}
+
+	public void setNumQueryAppear(int numQueryAppear) {
+		this.numQueryAppear = numQueryAppear;
+	}
+
 	
 	public String printFields() {
 		return resultVector.toString();		
@@ -225,5 +346,4 @@ public class MetaData {
 	public void setNumFav(long numFav) {
 		this.numFav = numFav;
 	}
-	
 }
