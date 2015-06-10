@@ -1,45 +1,47 @@
 package j2s;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Random;
 
 public class ReflectionEvaluation {
 	public static void main(String[] args) {
-		// tester(); 
-		System.out.println(equals_Wrapper(""));
-		System.out.println(toString_Wrapper());
-		System.out.println(compareTo_Wrapper(""));
-		System.out.println(indexOf_Wrapper("", 0));
-		System.out.println(indexOf_Wrapper(""));
+		generateMethods();
+//		runMethods();
+	}
+	
+	public static void runMethods() {
+		String test = "This is a test for native2native.";
+		System.out.println(equals_Wrapper(test));
+		System.out.println(toString_Wrapper(test));
+		System.out.println(compareTo_Wrapper(test, test));
+		System.out.println(indexOf_Wrapper(test, "test", 0));
+		System.out.println(indexOf_Wrapper(test, "test"));
 		System.out.println(valueOf_Wrapper(true));
 		System.out.println(valueOf_Wrapper(0.0));
 		System.out.println(valueOf_Wrapper(0));
-		System.out.println(valueOf_Wrapper(""));
-		System.out.println(length_Wrapper());
-		System.out.println(isEmpty_Wrapper());
-		System.out.println(charAt_Wrapper(0));
-		System.out.println(equalsIgnoreCase_Wrapper(""));
-		System.out.println(compareToIgnoreCase_Wrapper(""));
-		System.out.println(startsWith_Wrapper(""));
-		System.out.println(startsWith_Wrapper("", 0));
-		System.out.println(endsWith_Wrapper(""));
-		System.out.println(substring_Wrapper(0));
-		System.out.println(substring_Wrapper(0, 0));
-		System.out.println(concat_Wrapper(""));
-		System.out.println(replaceAll_Wrapper("", ""));
-		System.out.println(replaceFirst_Wrapper("", ""));
-		System.out.println(toLowerCase_Wrapper());
-		System.out.println(toUpperCase_Wrapper());
-		System.out.println(trim_Wrapper());
+		System.out.println(valueOf_Wrapper(test));
+		System.out.println(length_Wrapper(test));
+		System.out.println(isEmpty_Wrapper(test));
+		System.out.println(charAt_Wrapper(test, 0));
+		System.out.println(equalsIgnoreCase_Wrapper(test, "test"));
+		System.out.println(compareToIgnoreCase_Wrapper(test, "test"));
+		System.out.println(startsWith_Wrapper(test, "test"));
+		System.out.println(startsWith_Wrapper(test, "test", 0));
+		System.out.println(endsWith_Wrapper(test, "test"));
+		System.out.println(substring_Wrapper(test, 0));
+		System.out.println(substring_Wrapper(test, 0, 1));
+		System.out.println(concat_Wrapper(test, "test"));
+		System.out.println(replaceAll_Wrapper(test, "test", "test2"));
+		System.out.println(replaceFirst_Wrapper(test, "test", "test1"));
+		System.out.println(toLowerCase_Wrapper(test));
+		System.out.println(toUpperCase_Wrapper(test));
+		System.out.println(trim_Wrapper(test));
 	}
 
-	public static void tester() {
+	public static void generateMethods() {
 		try {
-			int index = 1;
 			Class<?> c = Class.forName("java.lang.String");
-			Object t = "This is a test for native2native.";
 
 			Method[] allMethods = c.getDeclaredMethods();
 			for (Method m : allMethods) {
@@ -69,7 +71,6 @@ public class ReflectionEvaluation {
 
 				try {
 					m.setAccessible(true);
-					Object o = m.invoke(t, args);
 
 					String argumentClassNames = "";
 					String arguments = "";
@@ -95,22 +96,15 @@ public class ReflectionEvaluation {
 						}
 					}
 
-					// System.out.println(index);
-					System.out.printf("public static %s %s_Wrapper(%s) {\n" + "\tString testString = \"This is a test for native2native.\";\n"
-							+ "\treturn testString.%s(%s);\n" + "}\n\n", rType, mName, argumentClassNames, mName, arguments);
-					index++;
+					System.out.printf("public static %s %s_Wrapper(%s) {\n"
+					+ "\tSystem.out.println(\"%s_Wrapper testing\");\n"
+					+ "\tString %sString = A;\n"
+					+ "\treturn %sString.%s(%s);\n"
+					+ "}\n\n", rType, mName, argumentClassNames, mName, mName, mName, mName, arguments);
 
 					// Handle any exceptions thrown by method to be
 					// invoked.
-				} catch (InvocationTargetException x) {
-					// Throwable cause = x.getCause();
-					// System.out.printf("invocation of %s failed: %s%n", mname,
-					// cause.getMessage());
-					continue;
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
+				}catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
 					// e.printStackTrace();
 					continue;
@@ -144,16 +138,18 @@ public class ReflectionEvaluation {
 	 * the same sequence of characters as this object.
 	 */
 	public static boolean equals_Wrapper(String A) {
-		String testString = "This is a test for native2native.";
-		return testString.equals("This is a test for native2native.");
+        System.out.println("equals_Wrapper testing");
+        String equalsString = "";
+        return equalsString.equals(A);
 	}
 
 	/*
 	 * This object (which is already a string!) is itself returned.
 	 */
-	public static String toString_Wrapper() {
-		String testString = "This is a test for native2native.";
-		return testString.toString();
+	public static String toString_Wrapper(String A) {
+		System.out.println("toString_Wrapper testing");
+        String toString = A;
+		return toString.toString();
 	}
 
 	/*
@@ -167,72 +163,85 @@ public class ReflectionEvaluation {
 	 * strings are equal; compareTo returns 0 exactly when the equals(Object)
 	 * method would return true.
 	 */
-	public static int compareTo_Wrapper(String A) {
-		String testString = "This is a test for native2native.";
-		return testString.compareTo("This is a test for native2native.");
+	public static int compareTo_Wrapper(String A, String B) {
+		System.out.println("compareTo_Wrapper testing");
+        String compareToString = A;
+		return compareToString.compareTo(B);
 	}
 
 	/*
 	 * Returns the index within this string of the first occurrence of the
 	 * specified substring, starting at the specified index.
 	 */
-	public static int indexOf_Wrapper(String A, Integer B) {
-		String testString = "This is a test for native2native.";
-		return testString.indexOf("test", 0);
+	public static int indexOf_Wrapper(String A, String B, Integer C) {
+		System.out.println("indexOfStartingAt_Wrapper testing");
+		String indexOfStartingAtString = A;
+		return indexOfStartingAtString.indexOf(B, C);
 	}
 
 	/*
 	 * Returns the index within this string of the first occurrence of the
 	 * specified substring.
 	 */
-	public static int indexOf_Wrapper(String A) {
-		String testString = "This is a test for native2native.";
-		return testString.indexOf("test");
+	public static int indexOf_Wrapper(String A, String B) {
+		System.out.println("indexOfSubstring_Wrapper testing");
+		String indexOfSubstringString = A;
+		return indexOfSubstringString.indexOf(B);
 	}
 
 	/*
 	 * Returns the string representation of the String argument.
 	 */
 	public static String valueOf_Wrapper(String A) {
-		return String.valueOf("This is a test for native2native.");
+		System.out.println("valueOfString_Wrapper testing");
+		String valueOfString = A;
+		return String.valueOf(valueOfString);
 	}
 
 	/*
 	 * Returns the string representation of the Boolean argument.
 	 */
 	public static String valueOf_Wrapper(Boolean A) {
-		return String.valueOf(true);
+		System.out.println("valueOfBoolean_Wrapper testing");
+		Boolean valueOfBoolean = A;
+		return String.valueOf(valueOfBoolean);
 	}
 
 	/*
 	 * Returns the string representation of the Integer argument.
 	 */
 	public static String valueOf_Wrapper(Integer A) {
-		return String.valueOf(1);
+		System.out.println("valueOfInteger_Wrapper testing");
+		Integer valueOfInteger_Wrapper = A;
+		return String.valueOf(valueOfInteger_Wrapper);
 	}
 
 	/*
 	 * Returns the string representation of the Double argument.
 	 */
 	public static String valueOf_Wrapper(Double A) {
-		return String.valueOf(0.0);
+		System.out.println("valueOfDouble_Wrapper testing");
+		Double valueOfDouble_Wrapper = A;
+		return String.valueOf(valueOfDouble_Wrapper);
 	}
 
 	/*
 	 * Returns the length of this string. The length is equal to the number of
 	 * Unicode code units in the string.
 	 */
-	public static int length_Wrapper() {
-		String testString = "This is a test for native2native.";
-		return testString.length();
+	public static int length_Wrapper(String A) {
+		System.out.println("length_Wrapper testing");
+		String lengthString = A;
+		return lengthString.length();
 	}
 
 	/*
 	 * Returns true if, and only if, length() is 0.
 	 */
-	public static boolean isEmpty_Wrapper() {
-		String testString = "This is a test for native2native.";
-		return testString.isEmpty();
+	public static boolean isEmpty_Wrapper(String A) {
+		System.out.println("isEmpty_Wrapper testing");
+		String isEmptyString = A;
+		return isEmptyString.isEmpty();
 	}
 
 	/*
@@ -240,9 +249,10 @@ public class ReflectionEvaluation {
 	 * length() - 1. The first char value of the sequence is at index 0, the
 	 * next at index 1, and so on, as for array indexing.
 	 */
-	public static char charAt_Wrapper(Integer A) {
-		String testString = "This is a test for native2native.";
-		return testString.charAt(0);
+	public static char charAt_Wrapper(String A, Integer B) {
+		System.out.println("charAt_Wrapper testing");
+		String charAtString = A;
+		return charAtString.charAt(B);
 	}
 
 	/*
@@ -250,9 +260,10 @@ public class ReflectionEvaluation {
 	 * strings are considered equal ignoring case if they are of the same length
 	 * and corresponding characters in the two strings are equal ignoring case.
 	 */
-	public static boolean equalsIgnoreCase_Wrapper(String A) {
-		String testString = "This is a test for native2native.";
-		return testString.equalsIgnoreCase("test");
+	public static boolean equalsIgnoreCase_Wrapper(String A, String B) {
+		System.out.println("equalsIgnoreCase_Wrapper testing");
+		String equalsIgnoreCaseString = A;
+		return equalsIgnoreCaseString.equalsIgnoreCase(B);
 	}
 
 	/*
@@ -263,34 +274,38 @@ public class ReflectionEvaluation {
 	 * Character.toLowerCase(Character.toUpperCase(character)) on each
 	 * character.
 	 */
-	public static int compareToIgnoreCase_Wrapper(String A) {
-		String testString = "This is a test for native2native.";
-		return testString.compareToIgnoreCase("test") > 0 ? 1 : 0;
+	public static int compareToIgnoreCase_Wrapper(String A, String B) {
+		System.out.println("compareToIgnoreCase_Wrapper testing");
+		String compareToIgnoreCaseString = A;
+		return compareToIgnoreCaseString.compareToIgnoreCase(B) > 0 ? 1 : 0;
 	}
 
 	/*
 	 * Tests if the substring of this string beginning at the specified index
 	 * starts with the specified prefix.
 	 */
-	public static boolean startsWith_Wrapper(String A, Integer B) {
-		String testString = "This is a test for native2native.";
-		return testString.startsWith("test", 1);
+	public static boolean startsWith_Wrapper(String A, String B, Integer C) {
+		System.out.println("startsWith_index_Wrapper testing");
+		String startsWithIndexString = A;
+		return startsWithIndexString.startsWith(B, C);
 	}
 
 	/*
 	 * Tests if this string starts with the specified prefix.
 	 */
-	public static boolean startsWith_Wrapper(String A) {
-		String testString = "This is a test for native2native.";
-		return testString.startsWith("test");
+	public static boolean startsWith_Wrapper(String A, String B) {
+		System.out.println("startsWith_Wrapper testing");
+		String startsWithString = A;
+		return startsWithString.startsWith(B);
 	}
 
 	/*
 	 * Tests if this string ends with the specified suffix.
 	 */
-	public static boolean endsWith_Wrapper(String A) {
-		String testString = "This is a test for native2native.";
-		return testString.endsWith("test");
+	public static boolean endsWith_Wrapper(String A, String B) {
+		System.out.println("endsWith_Wrapper testing");
+		String endsWithString = A;
+		return endsWithString.endsWith(B);
 	}
 
 	/*
@@ -298,9 +313,10 @@ public class ReflectionEvaluation {
 	 * begins at the specified beginIndex and extends to the character at index
 	 * endIndex - 1. Thus the length of the substring is endIndex-beginIndex.
 	 */
-	public static String substring_Wrapper(Integer A, Integer B) {
-		String testString = "This is a test for native2native.";
-		return testString.substring(0, 0);
+	public static String substring_Wrapper(String A, Integer B, Integer C) {
+		System.out.println("substring_begins_ends_Wrapper testing");
+		String substringBeginsEndsString = A;
+		return substringBeginsEndsString.substring(B, C);
 	}
 
 	/*
@@ -308,9 +324,10 @@ public class ReflectionEvaluation {
 	 * begins with the character at the specified index and extends to the end
 	 * of this string.
 	 */
-	public static String substring_Wrapper(Integer A) {
-		String testString = "This is a test for native2native.";
-		return testString.substring(0);
+	public static String substring_Wrapper(String A, Integer B) {
+		System.out.println("substring_begins_Wrapper testing");
+		String substringBeginsString = A;
+		return substringBeginsString.substring(B);
 	}
 
 	/*
@@ -322,27 +339,30 @@ public class ReflectionEvaluation {
 	 * represented by this String object and the character sequence represented
 	 * by the argument string.
 	 */
-	public static String concat_Wrapper(String A) {
-		String testString = "This is a test for native2native.";
-		return testString.concat("test");
+	public static String concat_Wrapper(String A, String B) {
+		System.out.println("concat_Wrapper testing");
+		String concatString = A;
+		return concatString.concat(B);
 	}
 
 	/*
 	 * Replaces the first substring of this string that matches the given
 	 * regular expression with the given replacement.
 	 */
-	public static String replaceFirst_Wrapper(String A, String B) {
-		String testString = "This is a test for native2native.";
-		return testString.replaceFirst("test", "test2");
+	public static String replaceFirst_Wrapper(String A, String B, String C) {
+		System.out.println("replaceFirst_Wrapper testing");
+		String replaceFirstString = A;
+		return replaceFirstString.replaceFirst(B, C);
 	}
 
 	/*
 	 * Replaces each substring of this string that matches the given regular
 	 * expression with the given replacement.
 	 */
-	public static String replaceAll_Wrapper(String A, String B) {
-		String testString = "This is a test for native2native.";
-		return testString.replaceAll("test", "test2");
+	public static String replaceAll_Wrapper(String A, String B, String C) {
+		System.out.println("replaceAll_Wrapper testing");
+		String replaceAllString = A;
+		return replaceAllString.replaceAll(B, C);
 	}
 
 	/*
@@ -350,9 +370,10 @@ public class ReflectionEvaluation {
 	 * rules of the default locale. This is equivalent to calling
 	 * toLowerCase(Locale.getDefault()).
 	 */
-	public static String toLowerCase_Wrapper() {
-		String testString = "This is a test for native2native.";
-		return testString.toLowerCase();
+	public static String toLowerCase_Wrapper(String A) {
+		System.out.println("toLowerCase_Wrapper testing");
+		String toLowerCaseString = A;
+		return toLowerCaseString.toUpperCase();
 	}
 
 	/*
@@ -360,17 +381,19 @@ public class ReflectionEvaluation {
 	 * rules of the default locale. This method is equivalent to
 	 * toUpperCase(Locale.getDefault()).
 	 */
-	public static String toUpperCase_Wrapper() {
-		String testString = "This is a test for native2native.";
-		return testString.toUpperCase();
+	public static String toUpperCase_Wrapper(String A) {
+		System.out.println("toUpperCase_Wrapper testing");
+		String toUpperCaseString = A;
+		return toUpperCaseString.toUpperCase();
 	}
 
 	/*
 	 * Returns a copy of the string, with leading and trailing whitespace
 	 * omitted.
 	 */
-	public static String trim_Wrapper() {
-		String testString = "This is a test for native2native.";
-		return testString.trim();
+	public static String trim_Wrapper(String A) {
+		System.out.println("trim_Wrapper testing");
+		String trimString = A;
+		return trimString.trim();
 	}
 }

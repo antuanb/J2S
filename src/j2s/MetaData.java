@@ -3,14 +3,7 @@ package j2s;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 
-/**
- * @author Antuan
- *
- */
 public class MetaData {
 	
 	private HashMap<String, Integer> frequency;

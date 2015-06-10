@@ -6,6 +6,8 @@ import com.google.code.stackexchange.schema.Answer;
 import com.google.code.stackexchange.schema.Question;
 
 public class AnswerWrapper implements Serializable {
+
+	private static final long serialVersionUID = -2413137617961594719L;
 	Answer answer;
 	Question question;
 	double rank;
