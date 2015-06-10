@@ -125,8 +125,11 @@ public class J2SView extends ViewPart {
 			System.out.println(rankedResults.get(i).getNormLinScore());
 			System.out.println(rankedResults.get(i).getFinalRankingScore());
 		}
+		
 		System.out.println("Number 1 ranked answer body is: ");
 		System.out.println(rankedResults.get(0).getAnswerBody().toString());
+		System.out.println("Number 2 ranked answer body is: ");
+		System.out.println(rankedResults.get(1).getAnswerBody().toString());
 	}
 	
 	private ISelectionListener selectionListener = new ISelectionListener() {

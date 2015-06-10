@@ -2,14 +2,21 @@ package j2s;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class ReflectionEvaluation {
 	public static void main(String[] args) {
-		generateMethods();
-//		runMethods();
+		// generateMethods("java.lang.String");
+		// generateMethods("java.util.ArrayList");
+		// generateMethods("java.util.HashMap");
+//		generateMethods("java.lang.Integer");
+		// runMethods();
 	}
-	
+
 	public static void runMethods() {
 		String test = "This is a test for native2native.";
 		System.out.println(equals_Wrapper(test));
@@ -39,9 +46,9 @@ public class ReflectionEvaluation {
 		System.out.println(trim_Wrapper(test));
 	}
 
-	public static void generateMethods() {
+	public static void generateMethods(String className) {
 		try {
-			Class<?> c = Class.forName("java.lang.String");
+			Class<?> c = Class.forName(className);
 
 			Method[] allMethods = c.getDeclaredMethods();
 			for (Method m : allMethods) {
@@ -74,37 +81,72 @@ public class ReflectionEvaluation {
 
 					String argumentClassNames = "";
 					String arguments = "";
-					if (args != null) {
-						for (int i = 0; i < args.length; i++) {
 
-							if (i + 1 == args.length) {
-								if (args[i].getClass().getSimpleName().equals("String")) {
-									arguments += ("\"" + args[i].toString() + "\"");
+					if (className.contains("String")) {
+						if (args != null) {
+							for (int i = 0; i < args.length; i++) {
+
+								if (i + 1 == args.length) {
+									if (args[i].getClass().getSimpleName().equals("String")) {
+										arguments += ("\"" + args[i].toString() + "\"");
+									} else {
+										arguments += (args[i].toString());
+									}
+									argumentClassNames += (args[i].getClass().getSimpleName() + " " + (char) (i + 66));
 								} else {
-									arguments += (args[i].toString());
+									if (args[i].getClass().getSimpleName().equals("String")) {
+										arguments += ("\"" + args[i].toString() + "\", ");
+									} else {
+										arguments += (args[i].toString() + ", ");
+									}
+									argumentClassNames += (args[i].getClass().getSimpleName() + " " + (char) (i + 66) + ", ");
 								}
-								argumentClassNames += (args[i].getClass().getSimpleName() + " " + (char) (i + 65));
-							} else {
-								if (args[i].getClass().getSimpleName().equals("String")) {
-									arguments += ("\"" + args[i].toString() + "\", ");
-								} else {
-									arguments += (args[i].toString() + ", ");
-								}
-								argumentClassNames += (args[i].getClass().getSimpleName() + " " + (char) (i + 65) + ", ");
+
 							}
-
 						}
-					}
 
-					System.out.printf("public static %s %s_Wrapper(%s) {\n"
-					+ "\tSystem.out.println(\"%s_Wrapper testing\");\n"
-					+ "\tString %sString = A;\n"
-					+ "\treturn %sString.%s(%s);\n"
-					+ "}\n\n", rType, mName, argumentClassNames, mName, mName, mName, mName, arguments);
+						System.out.printf("public static %s %s_Wrapper(%s) {\n" + "\tSystem.out.println(\"%s_Wrapper testing\");\n"
+								+ "\tString %sString = A;\n" + "\treturn %sString.%s(%s);\n" + "}\n\n", rType, mName, argumentClassNames, mName,
+								mName, mName, mName, arguments);
+					} else if (className.contains("ArrayList")) {
+						if (args != null) {
+							for (int i = 0; i < args.length; i++) {
+								if (i + 1 == args.length) {
+									arguments += (char) (i + 66);
+									argumentClassNames += (args[i].getClass().getSimpleName() + " " + (char) (i + 66));
+								} else {
+									arguments += (char) (i + 66) + ", ";
+									argumentClassNames += (args[i].getClass().getSimpleName() + " " + (char) (i + 66) + ", ");
+								}
+
+							}
+						}
+						System.out.printf("public static ArrayList<String> %s_Wrapper(ArrayList<String> A, %s) {\n"
+								+ "\tSystem.out.println(\"%s_Wrapper testing\");\n" + "\tArrayList<String> %sArrayList = A;\n"
+								+ "\t%sArrayList.%s(%s);\n" + "\treturn %sArrayList;\n" + "}\n\n", mName, argumentClassNames, mName, mName, mName,
+								mName, arguments, mName);
+					} else if (className.contains("HashMap")) {
+						if (args != null) {
+							for (int i = 0; i < args.length; i++) {
+								if (i + 1 == args.length) {
+									arguments += (char) (i + 66);
+									argumentClassNames += ", " + (args[i].getClass().getSimpleName() + " " + (char) (i + 66));
+								} else {
+									arguments += (char) (i + 66) + ", ";
+									argumentClassNames += ", " + (args[i].getClass().getSimpleName() + " " + (char) (i + 66));
+								}
+
+							}
+						}
+						System.out.printf("public static HashMap<String, String> %s_Wrapper(HashMap<String, String> A%s) {\n"
+								+ "\tSystem.out.println(\"%s_Wrapper testing\");\n" + "\tHashMap<String, String> %sHashMap = A;\n"
+								+ "\t%sHashMap.%s(%s);\n" + "\treturn %sHashMap;\n" + "}\n\n", mName, argumentClassNames, mName, mName, mName, mName,
+								arguments, mName);
+					}
 
 					// Handle any exceptions thrown by method to be
 					// invoked.
-				}catch (IllegalArgumentException e) {
+				} catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
 					// e.printStackTrace();
 					continue;
@@ -138,9 +180,9 @@ public class ReflectionEvaluation {
 	 * the same sequence of characters as this object.
 	 */
 	public static boolean equals_Wrapper(String A) {
-        System.out.println("equals_Wrapper testing");
-        String equalsString = "";
-        return equalsString.equals(A);
+		System.out.println("equals_Wrapper testing");
+		String equalsString = "";
+		return equalsString.equals(A);
 	}
 
 	/*
@@ -148,7 +190,7 @@ public class ReflectionEvaluation {
 	 */
 	public static String toString_Wrapper(String A) {
 		System.out.println("toString_Wrapper testing");
-        String toString = A;
+		String toString = A;
 		return toString.toString();
 	}
 
@@ -165,7 +207,7 @@ public class ReflectionEvaluation {
 	 */
 	public static int compareTo_Wrapper(String A, String B) {
 		System.out.println("compareTo_Wrapper testing");
-        String compareToString = A;
+		String compareToString = A;
 		return compareToString.compareTo(B);
 	}
 
@@ -395,5 +437,395 @@ public class ReflectionEvaluation {
 		System.out.println("trim_Wrapper testing");
 		String trimString = A;
 		return trimString.trim();
+	}
+
+	/*
+	 * Inserts the specified element at the specified position in this list.
+	 * Shifts the element currently at that position (if any) and any subsequent
+	 * elements to the right (adds one to their indices).
+	 */
+	public static ArrayList<String> add_Wrapper(ArrayList<String> A, Integer B, String C) {
+		System.out.println("addToIndex_Wrapper testing");
+		ArrayList<String> addToIndexArrayList = A;
+		addToIndexArrayList.add(B, C);
+		return addToIndexArrayList;
+	}
+
+	/*
+	 * Appends the specified element to the end of this list.
+	 */
+	public static ArrayList<String> add_Wrapper(ArrayList<String> A, String B) {
+		System.out.println("addToEnd_Wrapper testing");
+		ArrayList<String> addToEndArrayList = A;
+		addToEndArrayList.add(B);
+		return addToEndArrayList;
+	}
+
+	/*
+	 * Removes the element at the specified position in this list. Shifts any
+	 * subsequent elements to the left (subtracts one from their indices).
+	 */
+	public static ArrayList<String> remove_Wrapper(ArrayList<String> A, Integer B) {
+		System.out.println("removeAtIndex_Wrapper testing");
+		ArrayList<String> removeAtIndexArrayList = A;
+		removeAtIndexArrayList.remove(B.intValue());
+		return removeAtIndexArrayList;
+	}
+
+	/*
+	 * Removes the first occurrence of the specified element from this list, if
+	 * it is present.
+	 */
+	public static ArrayList<String> remove_Wrapper(ArrayList<String> A, String B) {
+		System.out.println("remove_Wrapper testing");
+		ArrayList<String> removeArrayList = A;
+		removeArrayList.remove(B);
+		return removeArrayList;
+	}
+
+	/*
+	 * Returns the element at the specified position in this list.
+	 */
+	public static String get_Wrapper(ArrayList<String> A, Integer B) {
+		System.out.println("get_Wrapper testing");
+		ArrayList<String> getArrayList = A;
+		return getArrayList.get(B);
+	}
+
+	/*
+	 * Returns a shallow copy of this ArrayList instance. (The elements
+	 * themselves are not copied.)
+	 */
+	public static ArrayList<String> clone_Wrapper(ArrayList<String> A) {
+		System.out.println("clone_Wrapper testing");
+		ArrayList<String> cloneArrayList = A;
+		cloneArrayList.clone();
+		return cloneArrayList;
+	}
+
+	/*
+	 * Returns the index of the first occurrence of the specified element in
+	 * this list, or -1 if this list does not contain the element.
+	 */
+	public static Integer indexOf_Wrapper(ArrayList<String> A, String B) {
+		System.out.println("indexOf_Wrapper testing");
+		ArrayList<String> indexOfArrayList = A;
+		return indexOfArrayList.indexOf(B);
+	}
+
+	/*
+	 * Removes all of the elements from this list. The list will be empty after
+	 * this call returns.
+	 */
+	public static ArrayList<String> clear_Wrapper(ArrayList<String> A) {
+		System.out.println("clear_Wrapper testing");
+		ArrayList<String> clearArrayList = A;
+		clearArrayList.clear();
+		return clearArrayList;
+	}
+
+	/*
+	 * Returns true if this list contains no elements.
+	 */
+	public static boolean isEmpty_Wrapper(ArrayList<String> A) {
+		System.out.println("isEmpty_Wrapper testing");
+		ArrayList<String> isEmptyArrayList = A;
+		return isEmptyArrayList.isEmpty();
+	}
+
+	/*
+	 * Returns the index of the last occurrence of the specified element in this
+	 * list, or -1 if this list does not contain the element. More formally,
+	 * returns the highest index i such that (o==null ? get(i)==null :
+	 * o.equals(get(i))), or -1 if there is no such index.
+	 */
+	public static Integer lastIndexOf_Wrapper(ArrayList<String> A, String B) {
+		System.out.println("lastIndexOf_Wrapper testing");
+		ArrayList<String> lastIndexOfArrayList = A;
+		return lastIndexOfArrayList.lastIndexOf(B);
+	}
+
+	/*
+	 * Returns true if this list contains the specified element
+	 */
+	public static Boolean contains_Wrapper(ArrayList<String> A, String B) {
+		System.out.println("contains_Wrapper testing");
+		ArrayList<String> containsArrayList = A;
+		return containsArrayList.contains(B);
+	}
+
+	/*
+	 * Returns the number of elements in this list.
+	 */
+	public static Integer size_Wrapper(ArrayList<String> A) {
+		System.out.println("size_Wrapper testing");
+		ArrayList<String> sizeArrayList = A;
+		return sizeArrayList.size();
+	}
+
+	/*
+	 * Returns a view of the portion of this list between the specified
+	 * fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex
+	 * are equal, the returned list is empty.) The returned list is backed by
+	 * this list, so non-structural changes in the returned list are reflected
+	 * in this list, and vice-versa. The returned list supports all of the
+	 * optional list operations.
+	 */
+	public static List<String> subList_Wrapper(ArrayList<String> A, Integer B, Integer C) {
+		System.out.println("subList_Wrapper testing");
+		ArrayList<String> subListArrayList = A;
+		return subListArrayList.subList(B, C);
+	}
+
+	/*
+	 * Appends all of the elements in the specified collection to the end of
+	 * this list, in the order that they are returned by the specified
+	 * collection's Iterator. The behavior of this operation is undefined if the
+	 * specified collection is modified while the operation is in progress.
+	 * (This implies that the behavior of this call is undefined if the
+	 * specified collection is this list, and this list is nonempty.)
+	 */
+	public static boolean addAll_Wrapper(ArrayList<String> A, ArrayList<String> B) {
+		System.out.println("addAll_Wrapper testing");
+		ArrayList<String> addAllArrayList = A;
+		return addAllArrayList.addAll(B);
+	}
+
+	/*
+	 * nserts all of the elements in the specified collection into this list,
+	 * starting at the specified position. Shifts the element currently at that
+	 * position (if any) and any subsequent elements to the right (increases
+	 * their indices). The new elements will appear in the list in the order
+	 * that they are returned by the specified collection's iterator.
+	 */
+	public static boolean addAll_Wrapper(ArrayList<String> A, Integer B, ArrayList<String> C) {
+		System.out.println("addAllAtIndex_Wrapper testing");
+		ArrayList<String> addAllAtIndexArrayList = A;
+		return addAllAtIndexArrayList.addAll(B, C);
+	}
+
+	/*
+	 * Replaces the element at the specified position in this list with the
+	 * specified element.
+	 */
+	public static ArrayList<String> set_Wrapper(ArrayList<String> A, Integer B, String C) {
+		System.out.println("set_Wrapper testing");
+		ArrayList<String> setArrayList = A;
+		setArrayList.set(B, C);
+		return setArrayList;
+	}
+
+	/*
+	 * Increases the capacity of this ArrayList instance, if necessary, to
+	 * ensure that it can hold at least the number of elements specified by the
+	 * minimum capacity argument.
+	 */
+	public static ArrayList<String> ensureCapacity_Wrapper(ArrayList<String> A, Integer B) {
+		System.out.println("ensureCapacity_Wrapper testing");
+		ArrayList<String> ensureCapacityArrayList = A;
+		ensureCapacityArrayList.ensureCapacity(B);
+		return ensureCapacityArrayList;
+	}
+
+	/*
+	 * Trims the capacity of this ArrayList instance to be the list's current
+	 * size. An application can use this operation to minimize the storage of an
+	 * ArrayList instance.
+	 */
+	public static ArrayList<String> trimToSize_Wrapper(ArrayList<String> A) {
+		System.out.println("trimToSize_Wrapper testing");
+		ArrayList<String> trimToSizeArrayList = A;
+		trimToSizeArrayList.trimToSize();
+		return trimToSizeArrayList;
+	}
+
+	/*
+	 * Removes from this list all of its elements that are contained in the
+	 * specified collection.
+	 */
+	public static ArrayList<String> removeAll_Wrapper(ArrayList<String> A, ArrayList<String> B) {
+		System.out.println("removeAll_Wrapper testing");
+		ArrayList<String> removeAllArrayList = A;
+		removeAllArrayList.removeAll(B);
+		return removeAllArrayList;
+	}
+
+	/*
+	 * Retains only the elements in this list that are contained in the
+	 * specified collection. In other words, removes from this list all of its
+	 * elements that are not contained in the specified collection.
+	 */
+	public static ArrayList<String> retainAll_Wrapper(ArrayList<String> A, ArrayList<String> B) {
+		System.out.println("retainAll_Wrapper testing");
+		ArrayList<String> retainAllArrayList = A;
+		retainAllArrayList.retainAll(B);
+		return retainAllArrayList;
+	}
+
+	/*
+	 * Returns a list iterator over the elements in this list (in proper
+	 * sequence), starting at the specified position in the list
+	 */
+	public static ArrayList<String> listIterator_Wrapper(ArrayList<String> A, Integer B) {
+		System.out.println("listIteratorFromIndex_Wrapper testing");
+		ArrayList<String> listIteratorFromIndexArrayList = A;
+		listIteratorFromIndexArrayList.listIterator(B);
+		return listIteratorFromIndexArrayList;
+	}
+
+	/*
+	 * Returns a list iterator over the elements in this list (in proper
+	 * sequence).
+	 */
+	public static ArrayList<String> listIterator_Wrapper(ArrayList<String> A) {
+		System.out.println("listIterator_Wrapper testing");
+		ArrayList<String> listIteratorArrayList = A;
+		listIteratorArrayList.listIterator();
+		return listIteratorArrayList;
+	}
+
+	/*
+	 * Removes the mapping for the specified key from this map if present.
+	 */
+	public static HashMap<String, String> remove_Wrapper(HashMap<String, String> A, String B) {
+		System.out.println("remove_Wrapper testing");
+		HashMap<String, String> removeHashMap = A;
+		removeHashMap.remove(B);
+		return removeHashMap;
+	}
+
+	/*
+	 * Returns the value to which the specified key is mapped, or null if this
+	 * map contains no mapping for the key.
+	 */
+	public static HashMap<String, String> get_Wrapper(HashMap<String, String> A, String B) {
+		System.out.println("get_Wrapper testing");
+		HashMap<String, String> getHashMap = A;
+		getHashMap.get(B);
+		return getHashMap;
+	}
+
+	/*
+	 * Associates the specified value with the specified key in this map. If the
+	 * map previously contained a mapping for the key, the old value is
+	 * replaced.
+	 */
+	public static HashMap<String, String> put_Wrapper(HashMap<String, String> A, String B, String C) {
+		System.out.println("put_Wrapper testing");
+		HashMap<String, String> putHashMap = A;
+		putHashMap.put(B, C);
+		return putHashMap;
+	}
+
+	/*
+	 * Returns a Collection view of the values contained in this map. The
+	 * collection is backed by the map, so changes to the map are reflected in
+	 * the collection, and vice-versa. If the map is modified while an iteration
+	 * over the collection is in progress (except through the iterator's own
+	 * remove operation), the results of the iteration are undefined. The
+	 * collection supports element removal, which removes the corresponding
+	 * mapping from the map, via the Iterator.remove, Collection.remove,
+	 * removeAll, retainAll and clear operations. It does not support the add or
+	 * addAll operations
+	 */
+	public static HashMap<String, String> values_Wrapper(HashMap<String, String> A) {
+		System.out.println("values_Wrapper testing");
+		HashMap<String, String> valuesHashMap = A;
+		valuesHashMap.values();
+		return valuesHashMap;
+	}
+
+	/*
+	 * Returns a shallow copy of this HashMap instance: the keys and values
+	 * themselves are not cloned.
+	 */
+	public static HashMap<String, String> clone_Wrapper(HashMap<String, String> A) {
+		System.out.println("clone_Wrapper testing");
+		HashMap<String, String> cloneHashMap = A;
+		cloneHashMap.clone();
+		return cloneHashMap;
+	}
+
+	/*
+	 * Removes all of the mappings from this map. The map will be empty after
+	 * this call returns.
+	 */
+	public static HashMap<String, String> clear_Wrapper(HashMap<String, String> A) {
+		System.out.println("clear_Wrapper testing");
+		HashMap<String, String> clearHashMap = A;
+		clearHashMap.clear();
+		return clearHashMap;
+	}
+
+	/*
+	 * Returns true if this map contains no key-value mappings.
+	 */
+	public static HashMap<String, String> isEmpty_Wrapper(HashMap<String, String> A) {
+		System.out.println("isEmpty_Wrapper testing");
+		HashMap<String, String> isEmptyHashMap = A;
+		isEmptyHashMap.isEmpty();
+		return isEmptyHashMap;
+	}
+
+	/*
+	 * Returns the number of key-value mappings in this map.
+	 */
+	public static HashMap<String, String> size_Wrapper(HashMap<String, String> A) {
+		System.out.println("size_Wrapper testing");
+		HashMap<String, String> sizeHashMap = A;
+		sizeHashMap.size();
+		return sizeHashMap;
+	}
+
+	/*
+	 * Returns a Set view of the mappings contained in this map.
+	 */
+	public static HashMap<String, String> entrySet_Wrapper(HashMap<String, String> A) {
+		System.out.println("entrySet_Wrapper testing");
+		HashMap<String, String> entrySetHashMap = A;
+		entrySetHashMap.entrySet();
+		return entrySetHashMap;
+	}
+
+	/*
+	 * Copies all of the mappings from the specified map to this map. These
+	 * mappings will replace any mappings that this map had for any of the keys
+	 * currently in the specified map.
+	 */
+	public static HashMap<String, String> putAll_Wrapper(HashMap<String, String> A, Map<String, String> B) {
+		System.out.println("putAll_Wrapper testing");
+		HashMap<String, String> putAllHashMap = A;
+		putAllHashMap.putAll(B);
+		return putAllHashMap;
+	}
+
+	/*
+	 * Returns a Set view of the keys contained in this map.
+	 */
+	public static HashMap<String, String> keySet_Wrapper(HashMap<String, String> A) {
+		System.out.println("keySet_Wrapper testing");
+		HashMap<String, String> keySetHashMap = A;
+		keySetHashMap.keySet();
+		return keySetHashMap;
+	}
+
+	/*
+	 * Returns true if this map maps one or more keys to the specified value.
+	 */
+	public static HashMap<String, String> containsValue_Wrapper(HashMap<String, String> A, String B) {
+		System.out.println("containsValue_Wrapper testing");
+		HashMap<String, String> containsValueHashMap = A;
+		containsValueHashMap.containsValue(B);
+		return containsValueHashMap;
+	}
+
+	/*
+	 * Returns true if this map contains a mapping for the specified key.
+	 */
+	public static HashMap<String, String> containsKey_Wrapper(HashMap<String, String> A, String B) {
+		System.out.println("containsKey_Wrapper testing");
+		HashMap<String, String> containsKeyHashMap = A;
+		containsKeyHashMap.containsKey(B);
+		return containsKeyHashMap;
 	}
 }
