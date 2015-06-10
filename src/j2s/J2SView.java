@@ -127,7 +127,7 @@ public class J2SView extends ViewPart {
 			System.out.println(rankedResults.get(i).getFinalRankingScore());
 		}
 		System.out.println("Number 1 ranked answer body is: ");
-		System.out.println(rankedResults.get(0).getAnswerBody());
+		System.out.println(rankedResults.get(0).getAnswerBody().toString());
 	}
 	
 	private ISelectionListener selectionListener = new ISelectionListener() {

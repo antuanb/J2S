@@ -220,8 +220,7 @@ public class SearchAndRank {
 				md.setNumInQuery(aw.getRank());
 				md.setNumViews(aw.getAnswer().getViewCount());
 				md.setNumVotes(aw.getAnswer().getScore());
-				md.setApprovedAnswer(aw.getAnswer().isAccepted());
-				md.setAnswerBody(aw.getAnswer().getBody());
+				md.setAnswerBody(ScrapeDataWithKeywords.parseHTMLForCode(aw.getAnswer().getBody()));
 				
 				//fields from question
 				md.setQuestionFavoriteCount(aw.getQuestion().getFavoriteCount());
@@ -229,6 +228,7 @@ public class SearchAndRank {
 				md.setQuestionTitle(aw.getQuestion().getTitle());
 				md.setQuestionUpVoteCount(aw.getQuestion().getUpVoteCount());
 				md.setQuestionViewCount(aw.getQuestion().getViewCount());
+				md.setApprovedAnswer(aw.getQuestion().getAcceptedAnswerId());
 
 				HashSet<String> titleTokens = createTitleTokens(aw.getAnswer().getTitle());
 				md.setTitleTokens(titleTokens);

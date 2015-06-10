@@ -16,7 +16,7 @@ public class MetaData {
 	private HashMap<String, Integer> frequency;
 	private HashSet<String> titleTokens;
 	private long numViews;
-	private boolean isApprovedAnswer;
+	private long isApprovedAnswer;
 	private long numVotes;
 	private long numDownVotes;
 	private long numFav;
@@ -31,7 +31,7 @@ public class MetaData {
 	private long questionViewCount;
 	private double cosValueFinal;
 	private double finalRankingScore;
-	private String answerBody;
+	private ArrayList<String> answerBody;
 	private ArrayList<Float> resultVector = new ArrayList<Float>();
 
 	//static feature weights for linear scoring
@@ -77,7 +77,7 @@ public class MetaData {
 		resultVector.add((float)this.getQuestionScore() * FEATURE_WEIGHTS.get("qScore"));
 		resultVector.add((float)this.getQuestionUpVoteCount() * FEATURE_WEIGHTS.get("qUp"));
 		resultVector.add((float)this.getQuestionViewCount() * FEATURE_WEIGHTS.get("qView"));
-		if (this.isApprovedAnswer()) {
+		if (this.isApprovedAnswer() == this.getID()) {
 			resultVector.add((float) (1.0 * FEATURE_WEIGHTS.get("isApprovedAnswer")));
 		}
 		else {
@@ -178,11 +178,11 @@ public class MetaData {
 		return total;
 	}
 	
-	public String getAnswerBody() {
+	public ArrayList<String> getAnswerBody() {
 		return answerBody;
 	}
 
-	public void setAnswerBody(String answerBody) {
+	public void setAnswerBody(ArrayList<String> answerBody) {
 		this.answerBody = answerBody;
 	}
 
@@ -315,11 +315,11 @@ public class MetaData {
 		this.numViews = numViews;
 	}
 
-	public boolean isApprovedAnswer() {
+	public long isApprovedAnswer() {
 		return isApprovedAnswer;
 	}
 
-	public void setApprovedAnswer(boolean isApprovedAnswer) {
+	public void setApprovedAnswer(long isApprovedAnswer) {
 		this.isApprovedAnswer = isApprovedAnswer;
 	}
 
