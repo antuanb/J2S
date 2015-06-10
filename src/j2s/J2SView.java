@@ -1,6 +1,9 @@
 package j2s;
 
-
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,32 +34,33 @@ public class J2SView extends ViewPart {
 	Button button;
 	Composite parent;
 	String selectedText = null;
+	String selectedLink = "";
 
 	public J2SView() {
 	}
-	
+
 	public void createPartControl(Composite parent) {
 		this.parent = parent;
-		
+
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
-		
+
 		label = new Label(parent, SWT.WRAP);
 
 		button = new Button(parent, SWT.PUSH);
 		button.setText("Generate Query");
-		
+
 		button.addSelectionListener(buttonListener);
-		
+
 		getSite().getWorkbenchWindow().getSelectionService().addSelectionListener(selectionListener);
-		
+
 	}
-    
-    private SelectionListener buttonListener = new SelectionListener() {
+
+	private SelectionListener buttonListener = new SelectionListener() {
 
 		@Override
 		public void widgetSelected(SelectionEvent arg0) {
-			label.setForeground(new Color (Display.getCurrent (), 255, 0, 0));
-			
+			label.setForeground(new Color(Display.getCurrent(), 255, 0, 0));
+
 			String filename = System.getProperty("user.home") + "/Downloads/methodSelection.txt";
 			File file = new File(filename);
 			file.setReadable(true);
@@ -64,13 +68,15 @@ public class J2SView extends ViewPart {
 			PrintWriter writer = null;
 			try {
 				writer = new PrintWriter(file);
-				
+
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			writer.print(selectedText);
 			writer.close();
+			label.setText("Query generated, awaiting results...");
+			parent.layout(true, true);
 			GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
 			ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
 			System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());
@@ -85,25 +91,79 @@ public class J2SView extends ViewPart {
 				e.printStackTrace();
 			}
 			ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
-			System.out.println(rankedResults.get(0).getID());
-			System.out.println(rankedResults.get(0).printFields());
-			System.out.println(rankedResults.get(1).getID());
-			System.out.println(rankedResults.get(1).printFields());
-			//System.out.println(rankedResults.get(1).getTitleTokens());
-			//rankedResults is final sorted list
-			//take rankedResults.get(0) for top choice, and so on
+			for (int i = 0; i < rankedResults.size(); i++) {
+				System.out.println(rankedResults.get(i).getID());
+				System.out.println(rankedResults.get(i).printFields());
+				System.out.println(rankedResults.get(i).getCosValueFinal());
+				System.out.println(rankedResults.get(i).getNormLinScore());
+				System.out.println(rankedResults.get(i).getFinalRankingScore());
+			}
+
+			label.setText("Results: ");
+			for (int i = 0; i < 2; i++) {
+				MetaData result = rankedResults.get(i);
+				if (result == null) {
+					continue;
+				} else {
+					newActionLink(parent, result.getQuestionTitle()
+							+ "\nhttp://www.stackoverflow.com/questions/" + result.getID());
+				}
+				
+			}
+			button.setVisible(false);
+			parent.layout(true, true);
 		}
 
 		@Override
 		public void widgetDefaultSelected(SelectionEvent arg0) {
 			// TODO Auto-generated method stub
-			
+
 		}
 	};
-	
+
+	/**
+	 * Creates and returns a new Link, which when selected, will run the
+	 * specified action.
+	 * 
+	 * @param parent
+	 *            The parent composite in which to create the new link.
+	 * @param text
+	 *            The text to display in the link.
+	 * @return The new link.
+	 */
+	public Button newActionLink(Composite parent, String text) {
+		Button button1 = new Button(parent, SWT.RADIO);
+		button1.setSelection(false);
+		button1.setText(text);
+		button1.setBackground(parent.getBackground());
+		button1.addSelectionListener(linkListener);
+		return button1;
+	}
+
+	private SelectionListener linkListener = new SelectionListener() {
+		@Override
+		public void widgetSelected(SelectionEvent arg0) {
+			Button test = (Button) arg0.getSource();
+			System.out.println(test.getText().split("\n")[1]);
+			StringSelection selection = new StringSelection(test.getText().split("\n")[1]);
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(selection, selection);
+			label.setText("URL copied to clipboard");
+//			button.setVisible(true);
+			parent.layout(true, true);
+		}
+
+		@Override
+		public void widgetDefaultSelected(SelectionEvent arg0) {
+			// TODO Auto-generated method stub
+
+		}
+	};
+
 	public static void main(String[] args) {
 		String filename = System.getProperty("user.home") + "/Downloads/methodSelection.txt";
-//		String filename = "C:\\Users\\Antuan\\Downloads\\methodSelection.txt";
+		// String filename =
+		// "C:\\Users\\Antuan\\Downloads\\methodSelection.txt";
 		GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
 		ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
 		System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());
@@ -125,50 +185,65 @@ public class J2SView extends ViewPart {
 			System.out.println(rankedResults.get(i).getNormLinScore());
 			System.out.println(rankedResults.get(i).getFinalRankingScore());
 		}
-		
+
 		System.out.println("Number 1 ranked answer body is: ");
 		System.out.println(rankedResults.get(0).getAnswerBody().toString());
 		System.out.println("Number 2 ranked answer body is: ");
 		System.out.println(rankedResults.get(1).getAnswerBody().toString());
 	}
-	
+
 	private ISelectionListener selectionListener = new ISelectionListener() {
-        public void selectionChanged(IWorkbenchPart sourcepart, ISelection selection) {
-        	if (sourcepart != J2SView.this) {
-			    showSelection(sourcepart, selection);
+		public void selectionChanged(IWorkbenchPart sourcepart, ISelection selection) {
+			if (sourcepart != J2SView.this) {
+				showSelection(sourcepart, selection);
 			}
-        }
-    };
-    
-    public void showSelection(IWorkbenchPart sourcepart, ISelection selection) {
+		}
+	};
+
+	public void showSelection(IWorkbenchPart sourcepart, ISelection selection) {
 		setContentDescription(sourcepart.getTitle() + " (" + selection.getClass().getName() + ")");
 
 		if (selection instanceof TextSelection) {
-			
-			label.setForeground(new Color (Display.getCurrent (), 0, 0, 0));
-			
-			ITextSelection ts  = (ITextSelection) selection;
+
+			label.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
+
+			ITextSelection ts = (ITextSelection) selection;
 			selectedText = ts.getText();
-		
-			
+			String[] lines = selectedText.split("\r\n|\r|\n");
+
 			if (selectedText.equals("") || selectedText == null) {
 				label.setText("Select entire method from Java file");
 			} else {
-				label.setText(ts.getText());
+				int startIndex = -1;
+				int endIndex = -1;
+				if (selectedText.contains("public")) {
+					startIndex = selectedText.indexOf("public");
+					endIndex = selectedText.indexOf(")", startIndex);
+				} else if (selectedText.contains("private")) {
+					startIndex = selectedText.indexOf("private");
+					endIndex = selectedText.indexOf(")", startIndex);
+				}
+				if (startIndex != -1 && endIndex != -1) {
+					String methodDeclaration = selectedText.substring(startIndex, endIndex + 1);
+					label.setText("Selected " + lines.length + " lines from method: \n\n" + methodDeclaration);
+				} else {
+					label.setText("Selected a valid method from the Java file.");
+				}
 			}
 			parent.layout(true, true);
 		}
-		
+
 	}
-	
+
 	public String getCurrentSelectedText() {
-	    final IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-	    if (!(editor instanceof ITextEditor)) return null;
-	    ITextEditor ite = (ITextEditor)editor;
-	    
-	    ITextSelection its = (ITextSelection) ite.getSelectionProvider().getSelection();
-	    
-	    return its.getText();
+		final IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		if (!(editor instanceof ITextEditor))
+			return null;
+		ITextEditor ite = (ITextEditor) editor;
+
+		ITextSelection its = (ITextSelection) ite.getSelectionProvider().getSelection();
+
+		return its.getText();
 	}
 
 	public void setFocus() {
@@ -176,9 +251,10 @@ public class J2SView extends ViewPart {
 		// make much sense, but for more complex sets of widgets
 		// you would decide which one gets the focus.
 	}
-	
+
 	public void dispose() {
-		// important: We need do unregister our listener when the view is disposed
+		// important: We need do unregister our listener when the view is
+		// disposed
 		getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(selectionListener);
 		super.dispose();
 	}
