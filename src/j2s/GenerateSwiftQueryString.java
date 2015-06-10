@@ -18,46 +18,17 @@ import com.google.code.stackexchange.schema.Answer;
 
 public class GenerateSwiftQueryString {
 
-	private static HashMap<String, Integer> frequency = new HashMap<String, Integer>();
-	private static HashSet<String> filterKeys;
-	private static final int NUM_FREQ_RETURN = 3;
 	private static String title = "";
+	private static String body = "";
 	public static MetaData mdQuery = new MetaData();
-
-	static {
-		filterKeys = new HashSet<String>();
-		filterKeys.add(" ");
-		filterKeys.add("public");
-		filterKeys.add("string");
-		filterKeys.add("\n");
-		filterKeys.add(".");
-		filterKeys.add(",");
-		filterKeys.add(":");
-		filterKeys.add(";");
-		filterKeys.add("");
-		filterKeys.add("{");
-		filterKeys.add("}");
-		filterKeys.add("[");
-		filterKeys.add("]");
-		filterKeys.add("?");
-		filterKeys.add("-");
-		filterKeys.add(">");
-		filterKeys.add("<");
-		filterKeys.add("=");
-		filterKeys.add("!");
-		filterKeys.add("\\");
-		filterKeys.add("\"");
-		filterKeys.add("%");
-		filterKeys.add("*");
-		filterKeys.add("/");
-	}
+	private static boolean initialQuery = true;
+	private static ArrayList<String> globalKeywords = new ArrayList<String>();
 
 	public ArrayList<String> executeFrequencyAnalysis(String filepath) {
 		BufferedReader br = null;
 		boolean flag = true;
 		try {
 			String sCurrentLine;
-
 			br = new BufferedReader(new FileReader(filepath));
 			while ((sCurrentLine = br.readLine()) != null) {
 				if (!sCurrentLine.trim().equals("")) {
@@ -67,15 +38,10 @@ public class GenerateSwiftQueryString {
 							title = sCurrentLine;
 						}
 					}
-					sCurrentLine = sCurrentLine.replaceAll("//.*|(\"(?:\\\\[^\"]|\\\\\"|.)*?\")|(?s)/\\*.*?\\*/", "$1 ");
-					List<String> tokens = SearchAndRank.process(sCurrentLine);
-					for (String token : tokens) {
-						parseToken(token);
+					StringTokenizer st = new StringTokenizer(sCurrentLine);
+					while (st.hasMoreTokens()) {
+						body += st.nextToken() + " ";
 					}
-//					StringTokenizer st = new StringTokenizer(sCurrentLine);
-//					while (st.hasMoreTokens()) {
-//						parseToken(st.nextToken());
-//					}
 				}
 			}
 		} catch (IOException e) {
@@ -89,18 +55,12 @@ public class GenerateSwiftQueryString {
 			}
 		}
 
-		
-		filterFrequency();
-		ArrayList<String> result = sortByValue(frequency);
-		ArrayList<String> keywords = new ArrayList<String>();
-		for (int i = 0; i < NUM_FREQ_RETURN; i++) {
-			keywords.add(result.get(i));
-		}
-		
+		//List<Map.Entry<String, Integer>> list = new LinkedList<>(frequency2.entrySet());
+		//System.out.println(list.toString());
+
 		generateQueryMetaDataObject();
-		frequency = new HashMap<String, Integer>();
 		
-		return keywords;
+		return globalKeywords;
 	}
 	
 	private static void generateQueryMetaDataObject() {
@@ -109,26 +69,21 @@ public class GenerateSwiftQueryString {
 		for (int i = 0; i < tokens.length; i++) {
 			titleTokens.add(tokens[i].toLowerCase());
 		}
-		
 		mdQuery.setTitleTokens(titleTokens);
 
 		HashMap<String, Integer> tempFreq = new HashMap<String, Integer>();
-		String body = "";
-		ArrayList<String> freqKeys = new ArrayList<String>();
-		freqKeys.addAll(frequency.keySet());
-		for (int i = 0; i < freqKeys.size(); i++) {
-			body += freqKeys.get(i) + " ";
-		}
-		body.substring(0, body.length()-1);
+		
 		Answer a = new Answer();
 		a.setBody(body);
-		a.setTitle("ANTUAN_AND_SANCHIT");
-		tempFreq = SearchAndRank.createTokenFrequency(a);
+		a.setTitle(title);
+		AnswerWrapper aw = new AnswerWrapper(null, a, 0.0);
+		
+		tempFreq = SearchAndRank.createTokenFrequency(aw, false);
 		SearchAndRank.DSet.add(tempFreq.keySet());
 		mdQuery.setFrequency(tempFreq);
 	}
-
-	public static ArrayList<String> sortByValue(HashMap<String, Integer> frequency) {
+	
+	public static HashMap<String, Integer> removeSubstring(HashMap<String, Integer> frequency) {		
 		List<Map.Entry<String, Integer>> list = new LinkedList<>(frequency.entrySet());
 		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
 			@Override
@@ -149,20 +104,18 @@ public class GenerateSwiftQueryString {
 		for (Map.Entry<String, Integer> entry : list) {
 			fullResult.put(entry.getKey(), entry.getValue());
 		}
-		
-		System.out.println("FULL RESULT: " + fullResult.toString());
-		
+						
 		List<String> keySetFrequency = new LinkedList<String>();
 		keySetFrequency.addAll(fullResult.keySet());
 		List<Integer> valueSetFrequency = new LinkedList<Integer>();
 		valueSetFrequency.addAll(fullResult.values());
-		HashMap<String, Integer> newFrequency = new HashMap<String, Integer>();
+		HashMap<String, Integer> newFrequency = new HashMap<String, Integer>();	
 		ArrayList<String> removalSetKey = new ArrayList<String>();
 		ArrayList<Integer> removalSetValue = new ArrayList<Integer>();
 		for (int i = 0; i < keySetFrequency.size(); i++) {
 			boolean flag = true;
 			for (int j = 0; j < removalSetKey.size(); j++) {
-				if (removalSetKey.get(j).contains(keySetFrequency.get(i))) {
+				if (removalSetKey.get(j).contains(keySetFrequency.get(i)) && keySetFrequency.get(i).length() > 2) {
 					removalSetValue.set(j, valueSetFrequency.get(i) + removalSetValue.get(j));
 					flag = false;
 					break;
@@ -176,8 +129,13 @@ public class GenerateSwiftQueryString {
 		for (int i = 0; i < removalSetKey.size(); i++) {
 			newFrequency.put(removalSetKey.get(i), removalSetValue.get(i));
 		}
-		
-		list = new LinkedList<>(newFrequency.entrySet());
+
+		return newFrequency;
+	}
+
+	public static ArrayList<String> sortByValue(HashMap<String, Integer> frequency) {
+		HashMap<String, Integer> newFrequency = removeSubstring(frequency);
+		List<Map.Entry<String, Integer>> list = new LinkedList<>(newFrequency.entrySet());
 		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
 			@Override
 			public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
@@ -185,7 +143,7 @@ public class GenerateSwiftQueryString {
 			}
 		});
 
-		fullResult = new LinkedHashMap<>();
+		Map<String, Integer> fullResult = new LinkedHashMap<>();
 		ArrayList<String> result = new ArrayList<String>();
 		for (Map.Entry<String, Integer> entry : list) {
 			fullResult.put(entry.getKey(), entry.getValue());
@@ -193,40 +151,12 @@ public class GenerateSwiftQueryString {
 		}
 		Collections.reverse(result);
 		System.out.println(fullResult.toString());
-
+		if (initialQuery) {
+			initialQuery = false;
+			globalKeywords.add(result.get(0));
+			globalKeywords.add(result.get(1));
+			globalKeywords.add(result.get(2));
+		}
 		return result;
-	}
-
-	private static void filterFrequency() {
-		for (String key : filterKeys) {
-			if (frequency.containsKey(key)) {
-				while (frequency.remove(key) != null) {
-
-				}
-			}
-		}
-	}
-
-	public static String applyStemming(String t) {
-		String token = t;
-		if (t.endsWith("ing")) {
-			token = t.substring(0, t.length() - 3);
-		}
-		return token;
-	}
-
-	private static void parseToken(String token) {
-		String[] tokens = token.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)|(\\n)|(\\,)|(\\@)");
-		for (int i = 0; i < tokens.length; i++) {
-			tokens[i] = tokens[i].toLowerCase();
-		}
-		for (String t : tokens) {
-//			t = applyStemming(t);
-			if (frequency.containsKey(t)) {
-				frequency.put(t, frequency.get(t) + 1);
-			} else {
-				frequency.put(t, 1);
-			}
-		}
 	}
 }

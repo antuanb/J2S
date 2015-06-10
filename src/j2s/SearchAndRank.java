@@ -73,6 +73,12 @@ public class SearchAndRank {
 		filterKeys.add("\\");
 		filterKeys.add("\"");
 		filterKeys.add("%");
+		filterKeys.add("*");
+		filterKeys.add("/");
+		filterKeys.add("*=");
+		filterKeys.add("\"=");
+		filterKeys.add("the");
+		filterKeys.add("this");
 	}
 
 	public SearchAndRank(ArrayList<String> searchKeywords) throws IOException, ClassNotFoundException {
@@ -233,7 +239,7 @@ public class SearchAndRank {
 				HashSet<String> titleTokens = createTitleTokens(aw.getAnswer().getTitle());
 				md.setTitleTokens(titleTokens);
 
-				HashMap<String, Integer> frequency = createTokenFrequency(aw.getAnswer());
+				HashMap<String, Integer> frequency = createTokenFrequency(aw, true);
 				md.setFrequency(frequency);
 				DSet.add(frequency.keySet());
 				DCount++;
@@ -309,21 +315,19 @@ public class SearchAndRank {
 		return newCosines;
 	}
 
-	public static HashMap<String, Integer> createTokenFrequency(Answer a) {
+	public static HashMap<String, Integer> createTokenFrequency(AnswerWrapper aw, boolean flag) {
 
 		HashMap<String, Integer> frequency = new HashMap<String, Integer>();
 
-		String answerBody = a.getBody();
-		String questionTitle = "";
-		if (a.getTitle() == null || !a.getTitle().equals("ANTUAN_AND_SANCHIT")) {
-			questionTitle = getQuestionTitle(a.getQuestionId());
-		}
+		String answerBody = aw.getAnswer().getBody();
+		String questionTitle = aw.getAnswer().getTitle();
 		String input = questionTitle + " " + answerBody;
 
 		input = Jsoup.parse(input).text(); // Remove HTML tags
 
 		// Remove Comments
-		input = input.replaceAll("//.*|(\"(?:\\\\[^\"]|\\\\\"|.)*?\")|(?s)/\\*.*?\\*/", "$1 ");
+		if (flag) 
+			input = input.replaceAll("//.*|(\"(?:\\\\[^\"]|\\\\\"|.)*?\")|(?s)/\\*.*?\\*/", "$1 ");
 
 		List<String> tokens = process(input); // Custom preprocessor by IBM
 
@@ -341,7 +345,7 @@ public class SearchAndRank {
 
 		for (String t : finalTokens) {
 			t = t.toLowerCase();
-			t = applyStemming(t);
+			//t = applyStemming(t);
 			if (frequency.containsKey(t)) {
 				frequency.put(t, frequency.get(t) + 1);
 			} else {
@@ -626,31 +630,4 @@ public class SearchAndRank {
 		}
 	}
 
-	private class AnswerWrapper implements Serializable {
-		Answer answer;
-		Question question;
-		double rank;
-
-		public AnswerWrapper(Question question, Answer answer, double rank) {
-			this.question = question;
-			this.answer = answer;
-			this.rank = rank;
-		}
-
-		public Question getQuestion() {
-			return question;
-		}
-
-		public Answer getAnswer() {
-			return answer;
-		}
-
-		public double getRank() {
-			return rank;
-		}
-
-		public String toString() {
-			return "" + this.answer.getAnswerId() + ", " + this.question.getQuestionId();
-		}
-	}
 }

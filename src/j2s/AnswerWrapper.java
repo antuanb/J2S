@@ -3,14 +3,21 @@ package j2s;
 import java.io.Serializable;
 
 import com.google.code.stackexchange.schema.Answer;
+import com.google.code.stackexchange.schema.Question;
 
-public class AnswerWrapper implements Serializable{
+public class AnswerWrapper implements Serializable {
 	Answer answer;
+	Question question;
 	double rank;
 
-	public AnswerWrapper(Answer answer, double rank) {
+	public AnswerWrapper(Question question, Answer answer, double rank) {
+		this.question = question;
 		this.answer = answer;
 		this.rank = rank;
+	}
+
+	public Question getQuestion() {
+		return question;
 	}
 
 	public Answer getAnswer() {
@@ -19,5 +26,10 @@ public class AnswerWrapper implements Serializable{
 
 	public double getRank() {
 		return rank;
+	}
+
+	public String toString() {
+		return "" + this.answer.getAnswerId() + ", "
+				+ this.question.getQuestionId();
 	}
 }
