@@ -1,6 +1,5 @@
 package j2s;
 
-import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -17,6 +16,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -45,6 +46,9 @@ public class J2SView extends ViewPart {
 		parent.setLayout(new RowLayout(SWT.VERTICAL));
 
 		label = new Label(parent, SWT.WRAP);
+		FontData[] fD = label.getFont().getFontData();
+		fD[0].setHeight(16);
+		label.setFont(new Font(null, fD));
 
 		button = new Button(parent, SWT.PUSH);
 		button.setText("Generate Query");
@@ -133,6 +137,9 @@ public class J2SView extends ViewPart {
 	 */
 	public Button newActionLink(Composite parent, String text) {
 		Button button1 = new Button(parent, SWT.RADIO);
+		FontData[] fD = button1.getFont().getFontData();
+		fD[0].setHeight(16);
+		button1.setFont(new Font(null, fD));
 		button1.setSelection(false);
 		button1.setText(text);
 		button1.setBackground(parent.getBackground());
