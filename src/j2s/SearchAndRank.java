@@ -77,6 +77,7 @@ public class SearchAndRank {
 		filterKeys.add("\"=");
 		filterKeys.add("the");
 		filterKeys.add("this");
+		filterKeys.add("//");
 	}
 
 	public SearchAndRank(ArrayList<String> searchKeywords) throws IOException, ClassNotFoundException {
