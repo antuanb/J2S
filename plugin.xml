@@ -9,7 +9,7 @@
             id="J2S">
       </category>
       <view
-            name="J2S View"
+            name="Native-2-Native"
             icon="icons/sample.gif"
             category="J2S"
             class="j2s.J2SView"
