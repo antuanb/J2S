@@ -197,6 +197,13 @@ public class J2SView extends ViewPart {
 		System.out.println(rankedResults.get(0).getAnswerBody().toString());
 		System.out.println("Number 2 ranked answer body is: ");
 		System.out.println(rankedResults.get(1).getAnswerBody().toString());
+		
+		
+		//here (should not be in main but actual plugin code but this is for testing)
+		//need to take the selection made by the programmer (rank 1 or 2)
+		//and call synthesize function in searchandrank with that index
+		int index = -1; //either 0 or 1 based on pluin
+		SearchAndRank.synthesize(index);
 	}
 
 	private ISelectionListener selectionListener = new ISelectionListener() {

@@ -23,6 +23,7 @@ public class GenerateSwiftQueryString {
 	public static MetaData mdQuery = new MetaData();
 	private static boolean initialQuery = true;
 	private static ArrayList<String> globalKeywords = new ArrayList<String>();
+	public static ArrayList<String> controlFlowCode = new ArrayList<String>();
 
 	public ArrayList<String> executeFrequencyAnalysis(String filepath) {
 		BufferedReader br = null;
@@ -36,7 +37,15 @@ public class GenerateSwiftQueryString {
 						if (sCurrentLine.startsWith("public") || sCurrentLine.startsWith("private")) {
 							flag = false;
 							title = sCurrentLine;
+							parseControlFlowLine(sCurrentLine, true);
 						}
+						//carry over method header comments to swift file
+						else {
+							controlFlowCode.add(sCurrentLine);
+						}
+					}
+					else {
+						parseControlFlowLine(sCurrentLine, false);
 					}
 					StringTokenizer st = new StringTokenizer(sCurrentLine);
 					while (st.hasMoreTokens()) {
@@ -55,12 +64,30 @@ public class GenerateSwiftQueryString {
 			}
 		}
 
-		//List<Map.Entry<String, Integer>> list = new LinkedList<>(frequency2.entrySet());
-		//System.out.println(list.toString());
-
 		generateQueryMetaDataObject();
 		
 		return globalKeywords;
+	}
+	
+	private static void parseControlFlowLine(String line, boolean isHeader) {
+		if (isHeader) {
+			String methodHeader = "";
+			//public static? void/type methodName(params?) {?
+			//handle potential header specific tokens and create
+			//string with the line for method declaration as one string (not an arraylist)
+			
+			controlFlowCode.add(methodHeader);
+		}
+		else {
+			String curLine = "";
+			//handle every other line here
+			//likely need hashmap of the syntax mapping we talked about earlier java-swift
+			//iterative parse with no memory of past/future lines
+			//treat all tokens as literal copy overs, not concerned with where an if statement's 
+			//bracket ends and so forth
+			
+			controlFlowCode.add(curLine);
+		}
 	}
 	
 	private static void generateQueryMetaDataObject() {
