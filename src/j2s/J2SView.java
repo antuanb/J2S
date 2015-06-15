@@ -36,6 +36,8 @@ public class J2SView extends ViewPart {
 	Composite parent;
 	String selectedText = null;
 	String selectedLink = "";
+	ArrayList<Button> resultRadioButtons;
+	int resultIndex;
 
 	public J2SView() {
 	}
@@ -56,7 +58,8 @@ public class J2SView extends ViewPart {
 		button.addSelectionListener(buttonListener);
 
 		getSite().getWorkbenchWindow().getSelectionService().addSelectionListener(selectionListener);
-
+		
+		resultRadioButtons = new ArrayList<Button>();
 	}
 
 	private SelectionListener buttonListener = new SelectionListener() {
@@ -64,6 +67,9 @@ public class J2SView extends ViewPart {
 		@Override
 		public void widgetSelected(SelectionEvent arg0) {
 			label.setForeground(new Color(Display.getCurrent(), 255, 0, 0));
+			
+			label.setText("Query generated, awaiting results...");
+			parent.layout(true, true);
 
 			String filename = System.getProperty("user.home") + "/Downloads/methodSelection.txt";
 			File file = new File(filename);
@@ -79,8 +85,6 @@ public class J2SView extends ViewPart {
 			}
 			writer.print(selectedText);
 			writer.close();
-			label.setText("Query generated, awaiting results...");
-			parent.layout(true, true);
 			GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
 			ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
 			System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());
@@ -104,13 +108,15 @@ public class J2SView extends ViewPart {
 			}
 
 			label.setText("Results: ");
+			
 			for (int i = 0; i < 2; i++) {
 				MetaData result = rankedResults.get(i);
 				if (result == null) {
 					continue;
 				} else {
-					newActionLink(parent, result.getQuestionTitle()
-							+ "\nhttp://www.stackoverflow.com/questions/" + result.getID());
+					String url = "http://www.stackoverflow.com/questions/" + result.getID();
+					Button buttonResult = newActionLink(parent, result.getQuestionTitle() + "\n" + url);
+					resultRadioButtons.add(buttonResult);
 				}
 				
 			}
@@ -136,28 +142,34 @@ public class J2SView extends ViewPart {
 	 * @return The new link.
 	 */
 	public Button newActionLink(Composite parent, String text) {
-		Button button1 = new Button(parent, SWT.RADIO);
-		FontData[] fD = button1.getFont().getFontData();
+		Button button = new Button(parent, SWT.RADIO);
+		FontData[] fD = button.getFont().getFontData();
 		fD[0].setHeight(16);
-		button1.setFont(new Font(null, fD));
-		button1.setSelection(false);
-		button1.setText(text);
-		button1.setBackground(parent.getBackground());
-		button1.addSelectionListener(linkListener);
-		return button1;
+		button.setFont(new Font(null, fD));
+		button.setSelection(false);
+		button.setText(text);
+		button.setBackground(parent.getBackground());
+		button.addSelectionListener(linkListener);
+		return button;
 	}
 
 	private SelectionListener linkListener = new SelectionListener() {
 		@Override
 		public void widgetSelected(SelectionEvent arg0) {
-			Button test = (Button) arg0.getSource();
-			System.out.println(test.getText().split("\n")[1]);
-			StringSelection selection = new StringSelection(test.getText().split("\n")[1]);
+			Button selectedButton = (Button) arg0.getSource();
+			String url = selectedButton.getText().split("\n")[1];
+			StringSelection selection = new StringSelection(url);
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			clipboard.setContents(selection, selection);
-			label.setText("URL copied to clipboard");
+			label.setText("URL copied and Swift file generated");
 //			button.setVisible(true);
 			parent.layout(true, true);
+			
+			//here (should not be in main but actual plugin code but this is for testing)
+			//need to take the selection made by the programmer (rank 1 or 2)
+			//and call synthesize function in searchandrank with that index
+			resultIndex = resultRadioButtons.indexOf(selectedButton);
+			SearchAndRank.synthesize(resultIndex);
 		}
 
 		@Override
@@ -185,25 +197,20 @@ public class J2SView extends ViewPart {
 			e.printStackTrace();
 		}
 		ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
-		for (int i = 0; i < rankedResults.size(); i++) {
-			System.out.println(rankedResults.get(i).getID());
-			System.out.println(rankedResults.get(i).printFields());
-			System.out.println(rankedResults.get(i).getCosValueFinal());
-			System.out.println(rankedResults.get(i).getNormLinScore());
-			System.out.println(rankedResults.get(i).getFinalRankingScore());
-		}
+//		for (int i = 0; i < rankedResults.size(); i++) {
+//			System.out.println(rankedResults.get(i).getID());
+//			System.out.println(rankedResults.get(i).printFields());
+//			System.out.println(rankedResults.get(i).getCosValueFinal());
+//			System.out.println(rankedResults.get(i).getNormLinScore());
+//			System.out.println(rankedResults.get(i).getFinalRankingScore());
+//		}
+		
+		SearchAndRank.synthesize(0);
 
-		System.out.println("Number 1 ranked answer body is: ");
-		System.out.println(rankedResults.get(0).getAnswerBody().toString());
-		System.out.println("Number 2 ranked answer body is: ");
-		System.out.println(rankedResults.get(1).getAnswerBody().toString());
-		
-		
-		//here (should not be in main but actual plugin code but this is for testing)
-		//need to take the selection made by the programmer (rank 1 or 2)
-		//and call synthesize function in searchandrank with that index
-		int index = -1; //either 0 or 1 based on pluin
-		SearchAndRank.synthesize(index);
+//		System.out.println("Number 1 ranked answer body is: ");
+//		System.out.println(rankedResults.get(0).getAnswerBody().toString());
+//		System.out.println("Number 2 ranked answer body is: ");
+//		System.out.println(rankedResults.get(1).getAnswerBody().toString());
 	}
 
 	private ISelectionListener selectionListener = new ISelectionListener() {
@@ -213,12 +220,21 @@ public class J2SView extends ViewPart {
 			}
 		}
 	};
+	
+	public void hideResults() {
+		for (Button result : resultRadioButtons) {
+			result.setVisible(false);
+		}
+	}
 
 	public void showSelection(IWorkbenchPart sourcepart, ISelection selection) {
 		setContentDescription(sourcepart.getTitle() + " (" + selection.getClass().getName() + ")");
+		
+		hideResults();
+		resultRadioButtons = new ArrayList<Button>();
 
 		if (selection instanceof TextSelection) {
-
+			button.setVisible(true);
 			label.setForeground(new Color(Display.getCurrent(), 0, 0, 0));
 
 			ITextSelection ts = (ITextSelection) selection;
@@ -241,7 +257,7 @@ public class J2SView extends ViewPart {
 					String methodDeclaration = selectedText.substring(startIndex, endIndex + 1);
 					label.setText("Selected " + lines.length + " lines from method: \n\n" + methodDeclaration);
 				} else {
-					label.setText("Selected a valid method from the Java file.");
+					label.setText("Select a valid method from the Java file.");
 				}
 			}
 			parent.layout(true, true);
