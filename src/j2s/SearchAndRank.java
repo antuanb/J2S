@@ -114,10 +114,12 @@ public class SearchAndRank {
 			writer.println();
 			for (String s : GenerateSwiftQueryString.controlFlowCode) {
 				//something like this?
-				if (s.equals("SIGNAL FOR API INSERT")) {
-					writer.println(sortedFinalRanking.get(index).getAnswerBody().toString());
+				if (s.equals("INSERT RESULT")) {
+					writer.println("\r\n /* NATIVE-2-NATIVE RESULT\r\n" 
+							+ sortedFinalRanking.get(index).getAnswerBody().toString() + "\r\n*/");
+				} else if (!s.equals("")) {
+					writer.println(s);
 				}
-				writer.println(s);
 			}
 			writer.close();
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {

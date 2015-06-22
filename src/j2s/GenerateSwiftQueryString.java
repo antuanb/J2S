@@ -44,14 +44,15 @@ public class GenerateSwiftQueryString {
 		javaNonAccessModifiers.add("volatile");
 	}
 
-	public ArrayList<String> executeFrequencyAnalysis(String filepath) {
+	public static ArrayList<String> executeFrequencyAnalysis(String filepath) {
 		BufferedReader br = null;
 		boolean flag = true;
 		try {
 			String sCurrentLine;
 			br = new BufferedReader(new FileReader(filepath));
 			while ((sCurrentLine = br.readLine()) != null) {
-				if (!sCurrentLine.trim().equals("")) {
+				sCurrentLine = sCurrentLine.trim();
+				if (!sCurrentLine.equals("")) {
 					if (flag) {
 						if (sCurrentLine.startsWith("public") || sCurrentLine.startsWith("private")) {
 							flag = false;
@@ -77,6 +78,7 @@ public class GenerateSwiftQueryString {
 			try {
 				if (br != null)
 					br.close();
+					controlFlowCode.add("INSERT RESULT");
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
@@ -88,12 +90,20 @@ public class GenerateSwiftQueryString {
 	}
 
 	public static void main(String[] args) {
-		String line = "private static String[] parseControlFlowLine(ArrayList<String> line, ArrayList<Boolean> isHeader) {";
+//		String line = "private static String[] parseControlFlowLine(ArrayList<String> line, ArrayList<Boolean> isHeader) {";
 		// String line =
 		// "public static ArrayList<Double> main(String[] args) {";
-		parseMethodHeader(line);
-		String methodHeader = generateSwiftMethodHeader(controlFlowCodeSwift);
-		System.out.println(methodHeader);
+//		parseMethodHeader(line);
+//		String methodHeader = generateSwiftMethodHeader(controlFlowCodeSwift);
+//		System.out.println(methodHeader);
+		
+		String filepath = "/Users/sanchit/Downloads/methodSelection.txt";
+		executeFrequencyAnalysis(filepath);
+		for (String test : controlFlowCode) {
+			if (!test.equals("")) {
+				System.out.println(test);
+			}
+		}
 	}
 
 	public static void parseMethodHeader(String line) {
@@ -237,17 +247,47 @@ public class GenerateSwiftQueryString {
 			parseMethodHeader(line);
 			String methodHeader = generateSwiftMethodHeader(controlFlowCodeSwift);
 			controlFlowCode.add(methodHeader);
+			controlFlowCode.add("// Insert Native-2-Native Result");
 		} else {
-			String curLine = "";
-			// handle every other line here
-			// likely need hashmap of the syntax mapping we talked about earlier
-			// java-swift
-			// iterative parse with no memory of past/future lines
-			// treat all tokens as literal copy overs, not concerned with where
-			// an if statement's
-			// bracket ends and so forth
-
+			String curLine = controlFlowParser(line);
 			controlFlowCode.add(curLine);
+		}
+	}
+
+	private static String controlFlowParser(String line) {
+		if (line.startsWith("if")) {
+			String conditionalLogic = line.substring(line.indexOf("("), line.indexOf(") ") + 1);
+			return "if /*" + conditionalLogic + "*/ {\r\n" ;
+		} else if (line.startsWith("for")) {
+			String iterationLogic = line.substring(line.indexOf("(") + 1, line.indexOf(") "));
+			String[] iterationTokens = iterationLogic.split(";");
+			
+			String initializationVariable = iterationTokens[0].split("=")[0].split(" ")[1];
+			String initializationIndex = iterationTokens[0].split("=")[1].trim();
+			String conditionLogicSymbol = iterationTokens[1].split(" ")[2];
+			String conditionEnd = "/*" + iterationTokens[1].split(" ")[3] + "*/";
+			String increment = iterationTokens[2].trim();
+			
+			String iterationLogicFinal = "for var " + initializationVariable + " = " + initializationIndex
+					+ "; " + initializationVariable + " " + conditionLogicSymbol + " " + conditionEnd
+					+ "; " + increment + " {";
+			
+			return iterationLogicFinal;
+		} else if (line.startsWith("while")) {
+			String conditionalLogic = line.substring(line.indexOf("("), line.indexOf(") ") + 1);
+			return "while /*" + conditionalLogic + "*/ {";
+		} else if (line.startsWith("} else {")) {
+			return "} else {\r\n";
+		} else if (line.startsWith("} else if")) {
+			String conditionalLogic = line.substring(line.indexOf("("), line.indexOf(") ") + 1);
+			return "} else if /*" + conditionalLogic + "*/ {\r\n";
+		} else if (line.startsWith("return ")) {
+			String returnValue = line.substring(7, line.length()-1);
+			return "return /*" + returnValue + "*/";
+		} else if (line.equals("}")) {
+			return line;
+		} else {
+			return "";
 		}
 	}
 
