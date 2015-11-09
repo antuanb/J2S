@@ -1,0 +1,30 @@
+Bluetooth LE Read Characteristic
+
+/**
+ *	Request a read on a given {@code BluetoothGattCharacteristic }. The read
+ *	result is reported asynchronously through the BluetoothGattCallback onCharacteristicRead callback.
+ *	@param characteristic The characteristic to read from.
+ */
+public void readCharacteristic(BluetoothGattCharacteristic characteristic) {
+    if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+    	Log.w(TAG, "BluetoothAdapter not initialized");
+		return; 
+	}
+    mBluetoothGatt.readCharacteristic(characteristic);
+}
+
+Keywords: [characteristic, bluetooth, read]
+
+Pre-rank
+http://stackoverflow.com/questions/25456892	YES
+http://stackoverflow.com/questions/25162634	NO
+http://stackoverflow.com/questions/32894672	YES
+http://stackoverflow.com/questions/29229075	NO
+http://stackoverflow.com/questions/19930380	YES
+
+Google Rank
+http://stackoverflow.com/questions/25456892	YES
+http://stackoverflow.com/questions/25162634	NO
+
+Our Rank
+http://stackoverflow.com/questions/32894672 YES (Only 1 Result... Rank bug) (3)

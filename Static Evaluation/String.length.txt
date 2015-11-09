@@ -1,0 +1,36 @@
+String length
+
+/∗
+∗ Returns the length of this string . The length is equal to the number of
+∗ Unicode code units in the string . ∗/
+     public static int length_Wrapper(String A) {
+      System.out.println("length_Wrapper testing");
+      String lengthString = A;
+      return lengthString.length();
+}
+
+Keywords: [length, string, println]
+
+Pre-rank
+http://stackoverflow.com/questions/24037756	YES
+http://stackoverflow.com/questions/29575208	YES
+http://stackoverflow.com/questions/24045156	NO
+http://stackoverflow.com/questions/24102844	NO
+http://stackoverflow.com/questions/28864666	NO
+http://stackoverflow.com/questions/30450559	NO
+http://stackoverflow.com/questions/30959555	YES
+http://stackoverflow.com/questions/24122445 NO
+
+Google Rank
+http://stackoverflow.com/questions/24037756	YES
+http://stackoverflow.com/questions/29575208	YES
+
+Our Rank
+http://stackoverflow.com/questions/30959555	YES (7)
+http://stackoverflow.com/questions/24045156 NO (3)
+http://stackoverflow.com/questions/24102844 NO (4)
+http://stackoverflow.com/questions/29575208 YES (2)
+http://stackoverflow.com/questions/24037756 YES (1)
+http://stackoverflow.com/questions/30450559 NO (6)
+http://stackoverflow.com/questions/24122445 NO (8)
+http://stackoverflow.com/questions/28864666 NO (5)

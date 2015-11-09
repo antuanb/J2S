@@ -1,0 +1,29 @@
+String indexOf
+
+/∗
+∗ Returns the index within this string of the first occurrence of the ∗ specified substring , starting at the specified index .
+∗/
+     public static int indexOf_Wrapper(String A, String B, Integer C) {
+      System.out.println("indexOfStartingAt_Wrapper testing");
+      String indexOfStartingAtString = A;
+      return indexOfStartingAtString.indexOf(B, C);
+}
+
+Keywords: [substring, of, index]
+
+Pre-rank
+http://stackoverflow.com/questions/28182819	YES
+http://stackoverflow.com/questions/24045156	YES
+http://stackoverflow.com/questions/24056932	YES
+http://stackoverflow.com/questions/24905366	YES
+http://stackoverflow.com/questions/27076020	YES
+http://stackoverflow.com/questions/32202314	YES
+http://stackoverflow.com/questions/30470961	NO
+http://stackoverflow.com/questions/30858139	NO
+
+Google Rank
+http://stackoverflow.com/questions/28182819	YES
+http://stackoverflow.com/questions/24045156	YES
+
+Our Rank
+http://stackoverflow.com/questions/32202314	YES	(Only 1 Result... Rank bug) (6)

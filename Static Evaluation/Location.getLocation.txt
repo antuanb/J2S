@@ -1,0 +1,46 @@
+Location
+
+	/**
+	 * Gets the location from the device's GPS sensor.
+	 * @param context The context of the application
+	 * @return String GPS location
+	 */
+	public static Location getLocation(Context context) {
+		locationManager = (LocationManager)context
+				.getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String bestProvider = locationManager
+        		.getBestProvider(criteria, false);
+        Location location = locationManager
+        		.getLastKnownLocation(bestProvider);
+        LocationListener loc_listener = new LocationListener() {
+            public void onLocationChanged(Location l) {}
+            public void onProviderEnabled(String p) {}
+            public void onProviderDisabled(String p) {}
+            public void onStatusChanged(String p, int status, Bundle extras) {}
+        };
+        locationManager.requestLocationUpdates(bestProvider, 0, 0, loc_listener);
+        location = locationManager.getLastKnownLocation(bestProvider);
+        LocationModel loc = new LocationModel(location.getLatitude(), location.getLongitude());
+    	return loc;
+	}
+
+Keywords: [location, gets, context] //Query keywords not useful
+
+Pre-rank
+http://stackoverflow.com/questions/28504650 YES
+http://stackoverflow.com/questions/29997447 NO
+http://stackoverflow.com/questions/32162976 NO
+http://stackoverflow.com/questions/27742678 NO
+http://stackoverflow.com/questions/24046979 NO
+
+Google Rank
+http://stackoverflow.com/questions/28504650 YES
+http://stackoverflow.com/questions/29997447 NO
+
+Our Rank
+http://stackoverflow.com/questions/24046979 NO
+http://stackoverflow.com/questions/27742678 NO
+http://stackoverflow.com/questions/28504650 YES
+http://stackoverflow.com/questions/29997447 NO
+http://stackoverflow.com/questions/32162976 NO

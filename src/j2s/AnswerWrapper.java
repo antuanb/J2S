@@ -31,7 +31,6 @@ public class AnswerWrapper implements Serializable {
 	}
 
 	public String toString() {
-		return "" + this.answer.getAnswerId() + ", "
-				+ this.question.getQuestionId();
+		return "http://stackoverflow.com/questions/" + this.answer.getAnswerId();// + ", " + this.question.getQuestionId();
 	}
 }

@@ -52,6 +52,10 @@ public class MetaData {
 		numQueryAppear = 1;
 	}
 	
+	public String toString() {
+		return "http://stackoverflow.com/questions/" + this.getID();// + ", " + this.question.getQuestionId();
+	}
+	
 	/*
 	 * Calculates the linear score for linear combinations model
 	 * 

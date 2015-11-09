@@ -1,0 +1,30 @@
+String Empty
+
+
+/∗
+∗ Returns true if , and only if , length () is 0. ∗/
+     public static boolean isEmpty_Wrapper(String A) {
+      System.out.println("isEmpty_Wrapper testing");
+      String isEmptyString = A;
+      return isEmptyString.isEmpty();
+}
+
+Keywords: [is, empty, string]
+
+
+Pre-rank
+http://stackoverflow.com/questions/24133180	YES
+http://stackoverflow.com/questions/31837576	NO
+http://stackoverflow.com/questions/27768113	NO
+http://stackoverflow.com/questions/27482610	YES
+http://stackoverflow.com/questions/899214	YES
+http://stackoverflow.com/questions/32783774	NO
+http://stackoverflow.com/questions/28333481	YES
+http://stackoverflow.com/questions/32784860	NO
+
+Google Rank
+http://stackoverflow.com/questions/24133180	YES
+http://stackoverflow.com/questions/31837576	NO
+
+Our Rank
+http://stackoverflow.com/questions/32784860	NO	(Only 1 Result... Rank bug) (7)

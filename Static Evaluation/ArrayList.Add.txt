@@ -1,0 +1,31 @@
+ArrayList Add
+
+
+/∗
+∗ Appends the specified element to the end of this list . ∗/
+     public static ArrayList<String> add_Wrapper(ArrayList<String> A, String B) {
+      System.out.println("addToEnd_Wrapper testing");
+      ArrayList<String> addToEndArrayList = A;
+      addToEndArrayList.add(B);
+      return addToEndArrayList;
+     }
+
+Keywords: [list, array, add]
+
+
+Pre-rank
+http://stackoverflow.com/questions/24002784	YES
+http://stackoverflow.com/questions/25838682	YES
+http://stackoverflow.com/questions/24172336	NO
+http://stackoverflow.com/questions/24128556	YES
+http://stackoverflow.com/questions/25146530	YES
+http://stackoverflow.com/questions/30434180	NO
+http://stackoverflow.com/questions/31226374	NO
+http://stackoverflow.com/questions/28426765 YES
+
+Google Rank
+http://stackoverflow.com/questions/24002784	YES
+http://stackoverflow.com/questions/25838682	YES
+
+Our Rank
+http://stackoverflow.com/questions/31226374 NO (Only 1 Result... Rank bug) (7)

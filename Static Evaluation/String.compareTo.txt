@@ -1,0 +1,30 @@
+String compareTo
+
+/*
+Compares two strings lexicographically . The comparison is based on the Unicode value of each character in the strings . The character sequence represented by this String object is compared lexicographically to the character sequence represented by the argument string. The result is a
+negative integer if this String object lexicographically precedes the argument string. The result is a positive integer if this String object lexicographically follows the argument string. The result is zero if the strings are equal ; compareTo returns 0 exactly when the equals ( Object ) method would return true.
+*/
+public static int compareTo_Wrapper(String A, String B) {
+  System.out.println("compareTo_Wrapper testing");
+  String compareToString = A;
+  return compareToString.compareTo(B);
+}
+
+Keywords: [string, compares, to]
+
+Pre-rank
+http://stackoverflow.com/questions/29663354	YES
+http://stackoverflow.com/questions/27334080	NO
+http://stackoverflow.com/questions/24096764	YES
+http://stackoverflow.com/questions/32482736	YES
+http://stackoverflow.com/questions/28951959	YES
+http://stackoverflow.com/questions/30533007	YES
+http://stackoverflow.com/questions/27800513	NO
+http://stackoverflow.com/questions/28358455	YES
+
+Google Rank
+http://stackoverflow.com/questions/29663354	YES
+http://stackoverflow.com/questions/27334080	NO
+
+Our Rank
+http://stackoverflow.com/questions/32482736 YES (Only 1 Result... Rank bug) (4)

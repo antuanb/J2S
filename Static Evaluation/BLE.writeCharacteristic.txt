@@ -1,0 +1,30 @@
+Bluetooth LE Write Characteristic
+
+/∗∗
+∗ Write a value to a given characteristic .
+∗ @param characteristic The characteristic to write to ∗ @return Value written successfully or not
+∗/
+     public boolean send(BluetoothGattCharacteristic characteristic) {
+      if (taskQueue.isEmpty()) {
+        System.out.println("empty queue");
+        return false;
+      }
+      try {
+        Thread.sleep(500);
+} catch (InterruptedException e) { // TODO Auto−generated catch block e.printStackTrace();
+}
+      characteristic.setValue(taskQueue.get(0).getTaskQueueEntry());
+      characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+      return mBluetoothGatt.writeCharacteristic(characteristic);
+}
+
+Keywords: [characteristic, *, write]
+
+Pre-rank
+http://stackoverflow.com/questions/30922059 YES
+
+Google Rank
+http://stackoverflow.com/questions/30922059 YES
+
+Our Rank
+http://stackoverflow.com/questions/30922059 YES

@@ -159,7 +159,7 @@ public class SearchAndRank {
 		// fullKeywordSet.add(tempKeyword.get(i).trim());
 		// }
 		if (searchKeywords.size() > 1) {
-			fullKeywordSet.add(searchKeywords.get(0) + " " + searchKeywords.get(1));
+//			fullKeywordSet.add(searchKeywords.get(0) + " " + searchKeywords.get(1));
 			// fullKeywordSet.add(searchKeywords.get(1) + " "
 			// + searchKeywords.get(0));
 		}
@@ -167,17 +167,17 @@ public class SearchAndRank {
 
 	private void search() {
 		for (String keyword : fullKeywordSet) {
-			queryResultStackOverflow = ScrapeDataWithKeywords.executeStackOverflowQuery(keyword);
-			for (int i = 0; i < queryResultStackOverflow.size(); i++) {
-
-				Iterator<Answer> answerIterator = queryResultStackOverflow.get(i).keySet().iterator();
-				Answer answer = answerIterator.next();
-				Question question = queryResultStackOverflow.get(i).get(answer);		
-
-				AnswerWrapper aw = new AnswerWrapper(question, answer, 1.0 - (double) (i + 1)
-						/ queryResultStackOverflow.size());
-				finalStackOverflowResultsList.add(aw);
-			}
+//			queryResultStackOverflow = ScrapeDataWithKeywords.executeStackOverflowQuery(keyword);
+//			for (int i = 0; i < queryResultStackOverflow.size(); i++) {
+//
+//				Iterator<Answer> answerIterator = queryResultStackOverflow.get(i).keySet().iterator();
+//				Answer answer = answerIterator.next();
+//				Question question = queryResultStackOverflow.get(i).get(answer);		
+//
+//				AnswerWrapper aw = new AnswerWrapper(question, answer, 1.0 - (double) (i + 1)
+//						/ queryResultStackOverflow.size());
+//				finalStackOverflowResultsList.add(aw);
+//			}
 
 			queryResultGoogleStack = ScrapeDataWithKeywords.executeGoogleSearchQuery_Stack(keyword);
 
@@ -202,6 +202,7 @@ public class SearchAndRank {
 					Question question = noAnswerCheck.get(j).get(answer);
 
 					AnswerWrapper aw = new AnswerWrapper(question, answer, 1.0 - (double) (j + 1) / queryResultGoogleStack.size());
+					System.out.println(aw);
 					aw.getAnswer().setTitle(question.getTitle());
 
 					//debug purposes
@@ -321,7 +322,9 @@ public class SearchAndRank {
 		Collections.reverse(list);
 		sortedFinalRanking = new ArrayList<MetaData>();
 		for (Map.Entry<Double, MetaData> entry : list) {
-			sortedFinalRanking.add(entry.getValue());
+			MetaData data = entry.getValue();
+			System.out.println(data);
+			sortedFinalRanking.add(data);
 		}
 	}
 

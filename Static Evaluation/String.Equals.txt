@@ -1,0 +1,30 @@
+String Equals
+
+	/∗
+	∗ Compares this string to the specified object . The result is true if and
+	∗ only if the argument is not null and is a String object that represents
+	∗ the same sequence of characters as this object . ∗/
+	     public static boolean equals_Wrapper(String A) {
+	      System.out.println("equals_Wrapper testing");
+	      String equalsString = "";
+	      return equalsString.equals(A);
+	}
+
+Keywords: [string, equals, *]
+
+Pre-rank
+http://stackoverflow.com/questions/24096764	YES
+http://stackoverflow.com/questions/29663354 NO
+http://stackoverflow.com/questions/27800513 YES
+http://stackoverflow.com/questions/27334080 NO
+http://stackoverflow.com/questions/30533007 YES
+http://stackoverflow.com/questions/26984746 NO
+http://stackoverflow.com/questions/25489336	YES
+http://stackoverflow.com/questions/28241077 YES
+
+Google Rank
+http://stackoverflow.com/questions/24096764	YES
+http://stackoverflow.com/questions/29663354 NO
+
+Our Rank
+http://stackoverflow.com/questions/29663354 NO (Only 1 Result... Rank bug) (2)

@@ -45,6 +45,7 @@ public class GenerateSwiftQueryString {
 	}
 
 	public static ArrayList<String> executeFrequencyAnalysis(String filepath) {
+//		globalKeywords = new ArrayList<String>();
 		BufferedReader br = null;
 		boolean flag = true;
 		try {

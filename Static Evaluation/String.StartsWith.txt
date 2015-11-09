@@ -1,0 +1,30 @@
+String StartsWith
+
+
+/∗
+∗ Tests if this string starts with the specified prefix . ∗/
+     public static boolean startsWith_Wrapper(String A, String B) {
+      System.out.println("startsWith_Wrapper testing");
+      String startsWithString = A;
+      return startsWithString.startsWith(B);
+}
+
+Keywords: [string, starts, with]
+
+
+Pre-rank
+http://stackoverflow.com/questions/24161872	YES
+http://stackoverflow.com/questions/7934704	YES
+http://stackoverflow.com/questions/28182819	NO
+http://stackoverflow.com/questions/26270721	NO
+http://stackoverflow.com/questions/24045156	YES
+http://stackoverflow.com/questions/24037756	NO
+http://stackoverflow.com/questions/24056932	NO
+http://stackoverflow.com/questions/24201206	NO
+
+Google Rank
+http://stackoverflow.com/questions/24161872	YES
+http://stackoverflow.com/questions/7934704	YES
+
+Our Rank
+http://stackoverflow.com/questions/28182819	NO	(Only 1 Result... Rank bug) (7)

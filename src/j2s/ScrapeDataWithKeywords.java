@@ -46,7 +46,7 @@ public class ScrapeDataWithKeywords {
 		}
 		if (Character.isDigit(keywords.charAt(0))) {
 			qId = Long.parseLong(keywords);
-			System.out.println("test");
+//			System.out.println("test");
 		} else {
 			questions = client.searchQuestions(keywords, tags, null, QuestionSortOrder.MOST_RELEVANT, null);
 //			questions = client.searchQuestions(keywords);
