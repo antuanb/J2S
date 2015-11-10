@@ -1,0 +1,30 @@
+/*
+* Returns the char value at the specified index. An index ranges from 0 to
+* length() - 1. The first char value of the sequence is at index 0, the
+* next at index 1, and so on, as for array indexing.
+*/
+public static char charAt_Wrapper(String A, Integer B) {
+System.out.println("charAt_Wrapper testing");
+String charAtString = A;
+return charAtString.charAt(B);
+}
+
+KEYWORDS: [char, at, indexing]
+
+Pre-Rank
+
+http://stackoverflow.com/questions/24056932 YES
+http://stackoverflow.com/questions/27104451 NO
+http://stackoverflow.com/questions/30470961 NO
+http://stackoverflow.com/questions/24144365 YES
+http://stackoverflow.com/questions/28182819 YES
+http://stackoverflow.com/questions/24974702 YES
+http://stackoverflow.com/questions/25674639 NO
+http://stackoverflow.com/questions/25266452 NO
+
+Google
+http://stackoverflow.com/questions/24056932 YES
+http://stackoverflow.com/questions/27104451 NO
+
+Our Rank
+http://stackoverflow.com/questions/25674639 NO  (7)

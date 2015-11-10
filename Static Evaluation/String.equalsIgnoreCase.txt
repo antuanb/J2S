@@ -1,0 +1,30 @@
+/*
+* Compares this String to another String, ignoring case considerations . Two
+* strings are considered equal ignoring case if they are of the same length
+* and corresponding characters in the two strings are equal ignoring case.
+*/
+public static boolean equalsIgnoreCase_Wrapper(String A, String B) {
+System.out.println("equalsIgnoreCase_Wrapper testing");
+String equalsIgnoreCaseString = A;
+return equalsIgnoreCaseString.equalsIgnoreCase(B);
+}
+
+KEYWORDS: [strings, case, equals]
+
+Pre-rank
+
+http://stackoverflow.com/questions/30533007 yes
+http://stackoverflow.com/questions/24096764 yes
+http://stackoverflow.com/questions/2582328  yes
+http://stackoverflow.com/questions/26270721 no
+http://stackoverflow.com/questions/24161872 yes
+http://stackoverflow.com/questions/24038680 no
+http://stackoverflow.com/questions/26703912 no
+http://stackoverflow.com/questions/27886953 no
+
+Google
+http://stackoverflow.com/questions/30533007 yes
+http://stackoverflow.com/questions/24096764 yes
+
+Our Rank
+http://stackoverflow.com/questions/30533007 yes (1)

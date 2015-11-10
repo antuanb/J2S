@@ -1,0 +1,29 @@
+String ToString
+
+/*
+* This object (which is already a string !) is itself returned.
+*/
+public static String toString_Wrapper(String A) {
+System.out.println("toString_Wrapper testing");
+String toString = A;
+return toString.toString();
+}
+
+Keywords: [string, to, a]
+
+Pre-rank
+http://stackoverflow.com/questions/26270721 YES
+http://stackoverflow.com/questions/26305392 YES
+http://stackoverflow.com/questions/24161392 YES
+http://stackoverflow.com/questions/24016254 NO
+http://stackoverflow.com/questions/24777965 NO
+http://stackoverflow.com/questions/30102506 YES
+http://stackoverflow.com/questions/30767654 NO
+http://stackoverflow.com/questions/24201206 YES
+
+Google Rank
+http://stackoverflow.com/questions/26270721 YES
+http://stackoverflow.com/questions/26305392 YES
+
+Our Rank
+http://stackoverflow.com/questions/30102506 YES (6)

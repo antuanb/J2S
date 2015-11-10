@@ -1,8 +1,8 @@
 String Empty
 
 
-/∗
-∗ Returns true if , and only if , length () is 0. ∗/
+/*
+* Returns true if , and only if , length () is 0. */
      public static boolean isEmpty_Wrapper(String A) {
       System.out.println("isEmpty_Wrapper testing");
       String isEmptyString = A;

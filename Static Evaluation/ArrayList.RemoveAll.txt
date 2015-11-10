@@ -1,16 +1,16 @@
 ArrayList RemoveAll
 
 
-/∗
-∗ Removes from this list all of its elements that are contained in the ∗ specified collection .
-∗/
+/*
+* Removes from this list all of its elements that are contained in the * specified collection .
+*/
 public static ArrayList<String> removeAll_Wrapper(ArrayList<String> A, ArrayList<String> B) {
   System.out.println("removeAll_Wrapper testing");
   ArrayList<String> removeAllArrayList = A;
   removeAllArrayList.removeAll(B);
   return removeAllArrayList;
 }
-Frequency: {return=1, contained=1, its=1, from=1, collection=1, in=1, ∗/=1, of=1, that=1, system=1, are=1, specified=1, println=1, testing=1, elements=1, out=1, static=2, b=3, a=3, ∗=3, wrapper=3, removes=8, all=8, array=10, list=11}
+Frequency: {return=1, contained=1, its=1, from=1, collection=1, in=1, */=1, of=1, that=1, system=1, are=1, specified=1, println=1, testing=1, elements=1, out=1, static=2, b=3, a=3, *=3, wrapper=3, removes=8, all=8, array=10, list=11}
 
 Keywords: [list, array, all] //INVALID KEYWORDS FOR QUERY. If it included remove, then results would've been relevant.
 

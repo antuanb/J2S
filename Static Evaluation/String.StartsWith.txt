@@ -1,8 +1,8 @@
 String StartsWith
 
 
-/∗
-∗ Tests if this string starts with the specified prefix . ∗/
+/*
+* Tests if this string starts with the specified prefix . */
      public static boolean startsWith_Wrapper(String A, String B) {
       System.out.println("startsWith_Wrapper testing");
       String startsWithString = A;

@@ -1,0 +1,36 @@
+String valueOf(String)
+
+/*
+* Returns the string representation of the String argument.
+*/
+public static String valueOf_Wrapper(String A) {
+System.out.println("valueOfString_Wrapper testing");
+String valueOfString = A;
+return String.valueOf(valueOfString);
+}
+
+Keywords: [string, of, value]
+
+Pre-rank
+http://stackoverflow.com/questions/24161392 YES
+http://stackoverflow.com/questions/31067069 NO
+http://stackoverflow.com/questions/24019320 YES
+http://stackoverflow.com/questions/33011665 YES
+http://stackoverflow.com/questions/26305392 YES
+http://stackoverflow.com/questions/32581323 NO
+http://stackoverflow.com/questions/31762749 YES
+http://stackoverflow.com/questions/24707744 NO
+
+Google Rank
+http://stackoverflow.com/questions/24161392 YES
+http://stackoverflow.com/questions/31067069 NO
+
+Our Rank
+http://stackoverflow.com/questions/24019320 YES (3)
+http://stackoverflow.com/questions/26305392 YES (5)
+http://stackoverflow.com/questions/24161392 YES (1)
+http://stackoverflow.com/questions/24707744 NO  (8)
+http://stackoverflow.com/questions/31067069 NO  (2)
+http://stackoverflow.com/questions/33011665 YES (4)
+http://stackoverflow.com/questions/32581323 NO  (6)
+http://stackoverflow.com/questions/31762749 YES (7)

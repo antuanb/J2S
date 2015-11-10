@@ -1,0 +1,42 @@
+Bluetooth LE Write Greater Than 20 Bytes
+
+/**
+* Write data greater than 20 bytes to a specified characteristic .
+*/
+private void sendData(BluetoothGattCharacteristic characteristic) {
+final Intent intent = new Intent(BluetoothLeService.SEND_ID_BACK);
+TaskQueue tq = new TaskQueue();
+while (sendDataIndex < dataToSend.length) {
+int amountToSend = dataToSend.length - sendDataIndex > 20 ? 20 :
+dataToSend.length - sendDataIndex;
+byte[] currentSend = Arrays.copyOfRange(dataToSend, sendDataIndex,
+amountToSend + sendDataIndex);
+tq.addTaskEntry(currentSend);
+sendDataIndex += amountToSend;
+}
+sendDataIndex = 0;
+tq.addTaskEntry(new String("EOM").getBytes());
+BluetoothLeService.taskQueue.add(tq);
+intent.putExtra("id", tq.getId());
+sendBroadcast(intent);
+mBluetoothLeService.send(characteristic)
+}
+
+
+Keywords: [send, data, to]
+
+Pre-rank
+http://stackoverflow.com/questions/26089243 NO
+http://stackoverflow.com/questions/28763677 NO
+http://stackoverflow.com/questions/29261590 NO
+http://stackoverflow.com/questions/24016254 NO
+http://stackoverflow.com/questions/29439662 NO
+http://stackoverflow.com/questions/27656215 NO
+http://stackoverflow.com/questions/24714709 NO
+
+Google Rank
+http://stackoverflow.com/questions/26089243 NO
+http://stackoverflow.com/questions/28763677 NO
+
+Our Rank
+http://stackoverflow.com/questions/29261590 NO (3)

@@ -180,9 +180,9 @@ public class J2SView extends ViewPart {
 	};
 
 	public static void main(String[] args) {
-		String filename = System.getProperty("user.home") + "/Downloads/methodSelection.txt";
-		// String filename =
-		// "C:\\Users\\Antuan\\Downloads\\methodSelection.txt";
+//		String filename = System.getProperty("user.home") + "/Downloads/methodSelection.txt";
+		 String filename =
+		 "C:\\Users\\Sanchit\\Downloads\\methodSelection.txt";
 		GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
 		ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
 		System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());

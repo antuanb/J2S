@@ -1,8 +1,8 @@
 ArrayList Add
 
 
-/∗
-∗ Appends the specified element to the end of this list . ∗/
+/*
+* Appends the specified element to the end of this list . */
      public static ArrayList<String> add_Wrapper(ArrayList<String> A, String B) {
       System.out.println("addToEnd_Wrapper testing");
       ArrayList<String> addToEndArrayList = A;

@@ -1,0 +1,36 @@
+String valueOf(Boolean)
+
+/*
+* Returns the string representation of the Boolean argument.
+*/
+public static String valueOf_Wrapper(Boolean A) {
+System.out.println("valueOfBoolean_Wrapper testing");
+Boolean valueOfBoolean = A;
+return String.valueOf(valueOfBoolean);
+}
+
+Keywords: [of, boolean, value]
+
+Pre-rank
+http://stackoverflow.com/questions/28137086 YES
+http://stackoverflow.com/questions/28107487 YES
+http://stackoverflow.com/questions/32505604 NO
+http://stackoverflow.com/questions/29151819 YES
+http://stackoverflow.com/questions/6358367  NO
+http://stackoverflow.com/questions/25523476 YES
+http://stackoverflow.com/questions/27558453 YES
+http://stackoverflow.com/questions/28159545 NO
+
+Google Rank
+http://stackoverflow.com/questions/28137086 YES
+http://stackoverflow.com/questions/28107487 YES
+
+Our Rank
+http://stackoverflow.com/questions/27558453 YES (7)
+http://stackoverflow.com/questions/28107487 YES (2)
+http://stackoverflow.com/questions/29151819 YES (4)
+http://stackoverflow.com/questions/6358367  NO (5)
+http://stackoverflow.com/questions/25523476 YES (6)
+http://stackoverflow.com/questions/28137086 YES (1)
+http://stackoverflow.com/questions/28159545 NO (8)
+http://stackoverflow.com/questions/32505604 NO (3)

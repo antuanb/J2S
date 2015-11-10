@@ -1,12 +1,12 @@
 String indexOf
 
 /*
-* Returns the index within this string of the first occurrence of the * specified substring , starting at the specified index .
+* Returns the index within this string of the first occurrence of the * specified substring.
 */
-     public static int indexOf_Wrapper(String A, String B, Integer C) {
-      System.out.println("indexOfStartingAt_Wrapper testing");
-      String indexOfStartingAtString = A;
-      return indexOfStartingAtString.indexOf(B, C);
+     public static int indexOf_Wrapper(String A, String B) {
+      System.out.println("indexOfSubstring_Wrapper testing");
+      String indexOfSubstringString = A;
+      return indexOfSubstringString.indexOf(B);
 }
 
 Keywords: [substring, of, index]

@@ -1,0 +1,36 @@
+String valueOf(Integer)
+
+/*
+* Returns the string representation of the Integer argument.
+*/
+public static String valueOf_Wrapper(Integer A) {
+System.out.println("valueOfInteger_Wrapper testing");
+Integer valueOfInteger_Wrapper = A;
+return String.valueOf(valueOfInteger_Wrapper);
+}
+
+Keywords: [of, integer, value]
+
+Pre-rank
+http://stackoverflow.com/questions/24019320 YES
+http://stackoverflow.com/questions/25216995 YES
+http://stackoverflow.com/questions/24159740 NO
+http://stackoverflow.com/questions/24183839 YES
+http://stackoverflow.com/questions/24161392 YES
+http://stackoverflow.com/questions/29930912 NO
+http://stackoverflow.com/questions/33009864 YES
+http://stackoverflow.com/questions/31899143 NO
+
+Google Rank
+http://stackoverflow.com/questions/24019320 YES
+http://stackoverflow.com/questions/25216995 YES
+
+Our Rank
+http://stackoverflow.com/questions/33009864 YES (7)
+http://stackoverflow.com/questions/29930912 NO (6)
+http://stackoverflow.com/questions/24161392 YES (5)
+http://stackoverflow.com/questions/24183839 YES (4)
+http://stackoverflow.com/questions/24019320 YES (1)
+http://stackoverflow.com/questions/24159740 NO (3)
+http://stackoverflow.com/questions/25216995 YES (2)
+http://stackoverflow.com/questions/31899143 NO (8)

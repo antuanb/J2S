@@ -1,9 +1,9 @@
 String Equals
 
-	/∗
-	∗ Compares this string to the specified object . The result is true if and
-	∗ only if the argument is not null and is a String object that represents
-	∗ the same sequence of characters as this object . ∗/
+	/*
+	* Compares this string to the specified object . The result is true if and
+	* only if the argument is not null and is a String object that represents
+	* the same sequence of characters as this object . */
 	     public static boolean equals_Wrapper(String A) {
 	      System.out.println("equals_Wrapper testing");
 	      String equalsString = "";

@@ -1,0 +1,29 @@
+String valueOf(Double)
+
+/*
+* Returns the string representation of the Double argument.
+*/
+public static String valueOf_Wrapper(Double A) {
+System.out.println("valueOfDouble_Wrapper testing");
+Double valueOfDouble_Wrapper = A;
+return String.valueOf(valueOfDouble_Wrapper);
+}
+
+Keywords: [of, double, value]
+
+Pre-rank
+http://stackoverflow.com/questions/26305392 YES
+http://stackoverflow.com/questions/27341001 NO
+http://stackoverflow.com/questions/25340084 YES
+http://stackoverflow.com/questions/27279483 YES
+http://stackoverflow.com/questions/25708691 YES
+http://stackoverflow.com/questions/28447767 NO
+http://stackoverflow.com/questions/31270082 YES
+http://stackoverflow.com/questions/30668213 NO
+
+Google Rank
+http://stackoverflow.com/questions/26305392 YES
+http://stackoverflow.com/questions/27341001 NO
+
+Our Rank
+http://stackoverflow.com/questions/30668213 NO  (8)

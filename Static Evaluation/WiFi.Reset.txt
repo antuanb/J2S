@@ -1,0 +1,41 @@
+WiFi Direct Reset
+
+/**
+* Reset wifi service .
+*/
+public static void resetWiFi() {
+WifiManager wifiManager = (WifiManager) context.getSystemService(
+Context.WIFI_SERVICE);
+wifiManager.setWifiEnabled(false);
+try {
+Thread.sleep(1000);
+} catch (InterruptedException e) {
+e.printStackTrace();
+}
+wifiManager.setWifiEnabled(true);
+}
+
+
+Keywords: [wifi, reset, manager]
+
+Pre-rank
+http://stackoverflow.com/questions/25853478 NO 
+http://stackoverflow.com/questions/17164233 NO 
+http://stackoverflow.com/questions/10736998 NO 
+http://stackoverflow.com/questions/6465280  NO 
+http://stackoverflow.com/questions/25283635 NO 
+http://stackoverflow.com/questions/28304303 NO 
+http://stackoverflow.com/questions/26372486 NO 
+                                            
+Google Rank                                 
+http://stackoverflow.com/questions/25853478 NO 
+http://stackoverflow.com/questions/17164233 NO 
+                                            
+Our Rank                                    
+http://stackoverflow.com/questions/6465280  NO 
+http://stackoverflow.com/questions/28304303 NO 
+http://stackoverflow.com/questions/25283635 NO 
+http://stackoverflow.com/questions/26372486 NO 
+http://stackoverflow.com/questions/25853478 NO 
+http://stackoverflow.com/questions/10736998 NO 
+http://stackoverflow.com/questions/17164233 NO 

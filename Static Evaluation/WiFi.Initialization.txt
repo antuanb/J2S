@@ -1,0 +1,40 @@
+WiFi Direct Initialization
+
+
+/*
+* Initialization for all wifi-direct functionality Set global filename
+* variable to file for transfer and call method
+*/
+public void wifiDirectInitialization() {
+manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+channel = manager.initialize(this, getMainLooper(), null);
+final IntentFilter intentFilter = new IntentFilter();
+intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+registerReceiver(wifiDirectReceiver, intentFilter);
+manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+@Override
+public void onSuccess() {
+System.out.println("WIFI DIRECT DISCOVERY INITIATED");
+}
+@Override
+public void onFailure(int reasonCode) {
+System.out.println("WIFI DIRECT DISCOVERY FAILED: " + reasonCode);
+}
+});
+}
+
+
+
+Keywords: [p, wifi-direct, manager]
+
+Pre-rank
+N/A
+
+Google Rank
+N/A
+
+Our Rank
+N/A

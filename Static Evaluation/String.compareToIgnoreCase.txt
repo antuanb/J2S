@@ -1,0 +1,39 @@
+/*
+* Compares two strings lexicographically , ignoring case differences . This
+* method returns an integer whose sign is that of calling compareTo with
+* normalized versions of the strings where case differences have been
+* eliminated by calling
+* Character.toLowerCase(Character.toUpperCase(character)) on each
+* character.
+*/
+public static int compareToIgnoreCase_Wrapper(String A, String B) {
+System.out.println("compareToIgnoreCase_Wrapper testing");
+String compareToIgnoreCaseString = A;
+return compareToIgnoreCaseString.compareToIgnoreCase(B) > 0 ? 1 : 0;
+}
+
+KEYWORDS: [case, to, strings]
+
+Pre-rank
+http://stackoverflow.com/questions/31871667 no
+http://stackoverflow.com/questions/30533007 yes
+http://stackoverflow.com/questions/27757816 no
+http://stackoverflow.com/questions/24707744 no
+http://stackoverflow.com/questions/24161392 no
+http://stackoverflow.com/questions/26245782 no
+http://stackoverflow.com/questions/31329741 no
+http://stackoverflow.com/questions/26306372 no
+
+Google
+http://stackoverflow.com/questions/31871667 no
+http://stackoverflow.com/questions/30533007 yes
+
+Our Rank
+http://stackoverflow.com/questions/30533007 YES (2)
+http://stackoverflow.com/questions/24161392 NO (5)
+http://stackoverflow.com/questions/31871667 NO (1)
+http://stackoverflow.com/questions/24707744 NO (4)
+http://stackoverflow.com/questions/26245782 NO (6)
+http://stackoverflow.com/questions/26306372 NO (8)
+http://stackoverflow.com/questions/27757816 NO (3)
+http://stackoverflow.com/questions/31329741 NO (7)
