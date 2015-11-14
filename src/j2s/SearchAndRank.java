@@ -34,6 +34,18 @@ import com.google.code.stackexchange.schema.Question;
 import com.google.code.stackexchange.schema.StackExchangeSite;
 
 public class SearchAndRank {
+	
+	public static void resetStaticVariables() {
+		fullKeywordSet = new ArrayList<String>();
+		tempKeyword.clear();
+		finalStackOverflowResultsList.clear();
+
+		totalUniqueTokens.clear();
+		filterKeys.clear();;
+		finalList.clear();
+		sortedFinalRanking.clear();
+		DSet.clear();
+	}
 
 	private static ArrayList<HashMap<Answer, Question>> queryResultStackOverflow;
 	private static ArrayList<HashMap<String, String>> queryResultGoogleStack;
@@ -94,7 +106,7 @@ public class SearchAndRank {
 		search();
 		System.out.println("search");
 		// writeObject();
-		System.out.println("writing");
+		//System.out.println("writing");
 		rank();
 		System.out.println("sorted and ranked, final list size is: " + sortedFinalRanking.size());
 		System.out.println("finalStackOverflowResultsList size: " + finalStackOverflowResultsList.size());
@@ -202,7 +214,8 @@ public class SearchAndRank {
 					Question question = noAnswerCheck.get(j).get(answer);
 
 					AnswerWrapper aw = new AnswerWrapper(question, answer, 1.0 - (double) (j + 1) / queryResultGoogleStack.size());
-					System.out.println(aw);
+					System.out.println("test" + aw);
+					J2SView.PreRank.add(aw.toString());
 					aw.getAnswer().setTitle(question.getTitle());
 
 					//debug purposes
@@ -282,7 +295,6 @@ public class SearchAndRank {
 			} else {
 				// not sure if this is how java works?
 				// might not actually be setting this so need to test
-				System.out.println("Ever call this?");
 				metaDataList.get(aw.getAnswer().getAnswerId()).setNumQueryAppear();
 			}
 		}
@@ -290,7 +302,7 @@ public class SearchAndRank {
 		// need to do same stuff for the non stack overflow results once we know
 		// how those are stored
 		// that is done here and make new metadata objects as well
-
+		
 		Iterator it = metaDataList.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry pair = (Map.Entry) it.next();
@@ -330,7 +342,6 @@ public class SearchAndRank {
 
 	private static double[] normalize(double[] cosines) {
 		float max = 0;
-		System.out.println(finalList.size());
 		for (int i = 0; i < finalList.size(); i++) {
 			if (finalList.get(i).getLinearScore() > max) {
 				max = finalList.get(i).getLinearScore();

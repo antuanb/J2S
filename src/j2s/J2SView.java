@@ -3,11 +3,18 @@ package j2s;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
@@ -30,6 +37,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import com.google.code.stackexchange.schema.Answer;
+import com.google.code.stackexchange.schema.Question;
+
 public class J2SView extends ViewPart {
 	Label label;
 	Button button;
@@ -38,7 +48,8 @@ public class J2SView extends ViewPart {
 	String selectedLink = "";
 	ArrayList<Button> resultRadioButtons;
 	int resultIndex;
-
+	public static ArrayList<String> PreRank = new ArrayList<String>();
+	
 	public J2SView() {
 	}
 
@@ -178,11 +189,67 @@ public class J2SView extends ViewPart {
 
 		}
 	};
+	
+	private static void createTestEvalData() {
+		String filename =
+				 "C:\\Users\\Antuan\\Downloads\\AllEvalCases.txt";
+		String output =
+				 "C:\\Users\\Antuan\\Downloads\\output.txt";
+		String methodTested =
+				 "C:\\Users\\Antuan\\Downloads\\methodTested.txt";
+		BufferedReader br = null;
+		try {
+			String sCurrentLine;
+			br = new BufferedReader(new FileReader(filename));
+			PrintWriter writer = null;
+			PrintWriter outputWriter = new PrintWriter(output, "UTF-8");
+			while ((sCurrentLine = br.readLine()) != null) {
+				writer = new PrintWriter(methodTested, "UTF-8");
+				sCurrentLine = sCurrentLine.trim();
+				if (!sCurrentLine.equals("")) {;
+					writer.println(sCurrentLine);
+					outputWriter.println(sCurrentLine);
+					outputWriter.println();
+				}
+				else {
+					GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
+					ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(methodTested);
+					outputWriter.println("PRINTING KEYWORDS: " + searchKeywords.toString());
+					outputWriter.println();
+					SearchAndRank sar = null;
+					try {
+						sar = new SearchAndRank(searchKeywords);
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+					ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;					
+					SearchAndRank.synthesize(0);
+					
+					resetStaticVariables();
+					
+					outputWriter.println();
+					outputWriter.println("------------------------------");
+					outputWriter.println();
+				}
+			}
+			writer.close();
+			outputWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void resetStaticVariables() {
+		PreRank.clear();
+		SearchAndRank.resetStaticVariables();
+	}
 
 	public static void main(String[] args) {
 //		String filename = System.getProperty("user.home") + "/Downloads/methodSelection.txt";
 		 String filename =
-		 "C:\\Users\\Sanchit\\Downloads\\methodSelection.txt";
+		 "C:\\Users\\Antuan\\Downloads\\methodSelection.txt";
 		GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
 		ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
 		System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());
@@ -196,7 +263,7 @@ public class J2SView extends ViewPart {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
+//		ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
 //		for (int i = 0; i < rankedResults.size(); i++) {
 //			System.out.println(rankedResults.get(i).getID());
 //			System.out.println(rankedResults.get(i).printFields());
@@ -211,6 +278,8 @@ public class J2SView extends ViewPart {
 //		System.out.println(rankedResults.get(0).getAnswerBody().toString());
 //		System.out.println("Number 2 ranked answer body is: ");
 //		System.out.println(rankedResults.get(1).getAnswerBody().toString());
+		
+		createTestEvalData();
 	}
 
 	private ISelectionListener selectionListener = new ISelectionListener() {

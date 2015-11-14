@@ -127,7 +127,7 @@ public class MetaData {
 		if (isTitle) {
 			newFreq++;
 		}
-		return (float) (newFreq * Math.log(SearchAndRank.DCount/DCountIn));
+		return (float) (newFreq * Math.log((float)SearchAndRank.DCount/DCountIn));
 	}
 	
 	/*
