@@ -45,7 +45,8 @@ public class GenerateSwiftQueryString {
 	}
 
 	public static ArrayList<String> executeFrequencyAnalysis(String filepath) {
-//		globalKeywords = new ArrayList<String>();
+		body = "";
+		globalKeywords = new ArrayList<String>();
 		BufferedReader br = null;
 		boolean flag = true;
 		try {
@@ -378,12 +379,12 @@ public class GenerateSwiftQueryString {
 		}
 		Collections.reverse(result);
 		System.out.println(fullResult.toString());
-		if (initialQuery) {
-			initialQuery = false;
+//		if (initialQuery) {
+//			initialQuery = false;
 			globalKeywords.add(result.get(0));
 			globalKeywords.add(result.get(1));
 			globalKeywords.add(result.get(2));
-		}
+//		}
 		return result;
 	}
 }

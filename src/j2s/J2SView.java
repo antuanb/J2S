@@ -101,7 +101,7 @@ public class J2SView extends ViewPart {
 			System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());
 			SearchAndRank sar = null;
 			try {
-				sar = new SearchAndRank(searchKeywords);
+				sar = new SearchAndRank(searchKeywords, null);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -192,49 +192,60 @@ public class J2SView extends ViewPart {
 	
 	private static void createTestEvalData() {
 		String filename =
-				 "C:\\Users\\Antuan\\Downloads\\AllEvalCases.txt";
+				 "C:\\Users\\Sanchit\\Downloads\\AllEvalCases.txt";
 		String output =
-				 "C:\\Users\\Antuan\\Downloads\\output.txt";
+				 "C:\\Users\\Sanchit\\Downloads\\output.csv";
 		String methodTested =
-				 "C:\\Users\\Antuan\\Downloads\\methodTested.txt";
+				 "C:\\Users\\Sanchit\\Downloads\\methodTested.txt";
 		BufferedReader br = null;
 		try {
 			String sCurrentLine;
 			br = new BufferedReader(new FileReader(filename));
-			PrintWriter writer = null;
+			PrintWriter writer = new PrintWriter(methodTested, "UTF-8");
 			PrintWriter outputWriter = new PrintWriter(output, "UTF-8");
 			while ((sCurrentLine = br.readLine()) != null) {
-				writer = new PrintWriter(methodTested, "UTF-8");
+				
 				sCurrentLine = sCurrentLine.trim();
-				if (!sCurrentLine.equals("")) {;
+				if (!sCurrentLine.equals("")) {
 					writer.println(sCurrentLine);
-					outputWriter.println(sCurrentLine);
-					outputWriter.println();
+					if (sCurrentLine.equals("*/")) {
+						String methodHeader = br.readLine().split("\\(")[0];
+						String[] methodHeaderArray = methodHeader.split(" ");
+						String methodName = methodHeaderArray[methodHeaderArray.length - 1];
+						outputWriter.println(methodName);
+						outputWriter.println();
+					}
+//					outputWriter.println(sCurrentLine);
+				}
+				else if (sCurrentLine.equals("STOP")) {
+					break;
 				}
 				else {
+					writer.close();
 					GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
 					ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(methodTested);
-					outputWriter.println("PRINTING KEYWORDS: " + searchKeywords.toString());
-					outputWriter.println();
+					writer = new PrintWriter(methodTested, "UTF-8");
+					System.out.println("KEYWORDS: " + searchKeywords.toString());
+//					outputWriter.println("KEYWORDS: " + searchKeywords.toString());
+//					outputWriter.println();
 					SearchAndRank sar = null;
 					try {
-						sar = new SearchAndRank(searchKeywords);
+						sar = new SearchAndRank(searchKeywords, outputWriter);
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
 					}
-					ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;					
-					SearchAndRank.synthesize(0);
+					ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
+//					SearchAndRank.synthesize(0);
 					
 					resetStaticVariables();
 					
 					outputWriter.println();
-					outputWriter.println("------------------------------");
+					outputWriter.println("---------------------------------------");
 					outputWriter.println();
 				}
 			}
-			writer.close();
 			outputWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -248,31 +259,31 @@ public class J2SView extends ViewPart {
 
 	public static void main(String[] args) {
 //		String filename = System.getProperty("user.home") + "/Downloads/methodSelection.txt";
-		 String filename =
-		 "C:\\Users\\Antuan\\Downloads\\methodSelection.txt";
-		GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
-		ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
-		System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());
-		SearchAndRank sar = null;
-		try {
-			sar = new SearchAndRank(searchKeywords);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-//		ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
-//		for (int i = 0; i < rankedResults.size(); i++) {
-//			System.out.println(rankedResults.get(i).getID());
-//			System.out.println(rankedResults.get(i).printFields());
-//			System.out.println(rankedResults.get(i).getCosValueFinal());
-//			System.out.println(rankedResults.get(i).getNormLinScore());
-//			System.out.println(rankedResults.get(i).getFinalRankingScore());
+//		 String filename =
+//		 "C:\\Users\\Antuan\\Downloads\\methodSelection.txt";
+//		GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
+//		ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(filename);
+//		System.out.println("PRINTING KEYWORDS: " + searchKeywords.toString());
+//		SearchAndRank sar = null;
+//		try {
+//			sar = new SearchAndRank(searchKeywords);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (ClassNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
 //		}
-		
-		SearchAndRank.synthesize(0);
+////		ArrayList<MetaData> rankedResults = sar.sortedFinalRanking;
+////		for (int i = 0; i < rankedResults.size(); i++) {
+////			System.out.println(rankedResults.get(i).getID());
+////			System.out.println(rankedResults.get(i).printFields());
+////			System.out.println(rankedResults.get(i).getCosValueFinal());
+////			System.out.println(rankedResults.get(i).getNormLinScore());
+////			System.out.println(rankedResults.get(i).getFinalRankingScore());
+////		}
+//		
+//		SearchAndRank.synthesize(0);
 
 //		System.out.println("Number 1 ranked answer body is: ");
 //		System.out.println(rankedResults.get(0).getAnswerBody().toString());

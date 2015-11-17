@@ -41,7 +41,6 @@ public class SearchAndRank {
 		finalStackOverflowResultsList.clear();
 
 		totalUniqueTokens.clear();
-		filterKeys.clear();;
 		finalList.clear();
 		sortedFinalRanking.clear();
 		DSet.clear();
@@ -86,6 +85,7 @@ public class SearchAndRank {
 		filterKeys.add(">");
 		filterKeys.add("<");
 		filterKeys.add("=");
+		filterKeys.add("@");
 		filterKeys.add("!");
 		filterKeys.add("\\");
 		filterKeys.add("\"");
@@ -97,17 +97,25 @@ public class SearchAndRank {
 		filterKeys.add("the");
 		filterKeys.add("this");
 		filterKeys.add("//");
+		filterKeys.add("/");
+		filterKeys.add("*/");
 	}
 
-	public SearchAndRank(ArrayList<String> searchKeywords) throws IOException, ClassNotFoundException {
+	public SearchAndRank(ArrayList<String> searchKeywords, PrintWriter outputWriter) throws IOException, ClassNotFoundException {
 		System.out.println("start");
 		initKeywordSet(searchKeywords);
 		System.out.println("mid");
-		search();
+		if (outputWriter != null) {
+			outputWriter.println("Pre-rank");
+		}
+		search(outputWriter);
 		System.out.println("search");
 		// writeObject();
 		//System.out.println("writing");
-		rank();
+		if (outputWriter != null) {
+			outputWriter.println("Our Rank");
+		}
+		rank(outputWriter);
 		System.out.println("sorted and ranked, final list size is: " + sortedFinalRanking.size());
 		System.out.println("finalStackOverflowResultsList size: " + finalStackOverflowResultsList.size());
 	}
@@ -177,7 +185,7 @@ public class SearchAndRank {
 		}
 	}
 
-	private void search() {
+	private void search(PrintWriter outputWriter) {
 		for (String keyword : fullKeywordSet) {
 //			queryResultStackOverflow = ScrapeDataWithKeywords.executeStackOverflowQuery(keyword);
 //			for (int i = 0; i < queryResultStackOverflow.size(); i++) {
@@ -214,7 +222,11 @@ public class SearchAndRank {
 					Question question = noAnswerCheck.get(j).get(answer);
 
 					AnswerWrapper aw = new AnswerWrapper(question, answer, 1.0 - (double) (j + 1) / queryResultGoogleStack.size());
-					System.out.println("test" + aw);
+					System.out.println(aw);
+					if (outputWriter != null) {
+						outputWriter.println(aw + "," + (i + 1));
+					}
+					
 					J2SView.PreRank.add(aw.toString());
 					aw.getAnswer().setTitle(question.getTitle());
 
@@ -243,6 +255,13 @@ public class SearchAndRank {
 					}
 				}
 			}
+			if (outputWriter != null) {
+				outputWriter.println();
+				outputWriter.println("Google Rank");
+				outputWriter.println(finalStackOverflowResultsList.get(0) + ",1");
+				outputWriter.println(finalStackOverflowResultsList.get(1) + ",2");
+				outputWriter.println();
+			}
 
 			// make global static list of whatever item we use to store these
 			// non stackoverflow posts
@@ -257,7 +276,7 @@ public class SearchAndRank {
 
 	}
 
-	private void rank() {
+	private void rank(PrintWriter outputWriter) {
 		HashMap<Long, MetaData> metaDataList = new HashMap<Long, MetaData>();
 		HashSet<Long> uniques = new HashSet<Long>();
 		DSet.add(GenerateSwiftQueryString.mdQuery.getFrequency().keySet());
@@ -336,6 +355,10 @@ public class SearchAndRank {
 		for (Map.Entry<Double, MetaData> entry : list) {
 			MetaData data = entry.getValue();
 			System.out.println(data);
+			if (outputWriter != null) {
+				outputWriter.println(data + ",");
+			}
+			
 			sortedFinalRanking.add(data);
 		}
 	}
@@ -385,7 +408,7 @@ public class SearchAndRank {
 
 		for (String token : tempTokens) {
 			// camelCase, Class/method names etc
-			String[] codeTokens = token.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)|(\\n)|(\\,)|(\\@)");
+			String[] codeTokens = token.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)|(\\n)");
 			finalTokens.addAll(Arrays.asList(codeTokens));
 		}
 
