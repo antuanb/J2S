@@ -75,6 +75,7 @@ public class SearchAndRank {
 		filterKeys.add(",");
 		filterKeys.add(":");
 		filterKeys.add(";");
+		filterKeys.add("'");
 		filterKeys.add("");
 		filterKeys.add("{");
 		filterKeys.add("}");
@@ -408,7 +409,7 @@ public class SearchAndRank {
 
 		for (String token : tempTokens) {
 			// camelCase, Class/method names etc
-			String[] codeTokens = token.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)|(\\n)");
+			String[] codeTokens = token.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)|(\\n)|(\\-)|(\\')");//|(([a-z]|[A-Z])([0-9])([a-z]|[A-Z]))");
 			finalTokens.addAll(Arrays.asList(codeTokens));
 		}
 
@@ -416,11 +417,14 @@ public class SearchAndRank {
 
 		for (String t : finalTokens) {
 			t = t.toLowerCase();
+			t = filterHashMap(t);
 			//t = applyStemming(t);
-			if (frequency.containsKey(t)) {
-				frequency.put(t, frequency.get(t) + 1);
-			} else {
-				frequency.put(t, 1);
+			if (t != "") {
+				if (frequency.containsKey(t)) {
+					frequency.put(t, frequency.get(t) + 1);
+				} else {
+					frequency.put(t, 1);
+				}
 			}
 		}
 
@@ -429,6 +433,16 @@ public class SearchAndRank {
 		totalUniqueTokens.addAll(uniqueLocalFrequencyList);
 
 		return frequency;
+	}
+	
+	public static String filterHashMap(String t) {
+		String token = t;
+		if (t.contains("map")) {
+			token = "dictionary";
+		} else if (t.contains("hash")) {
+			return "";
+		}
+		return token;
 	}
 
 	private static void removeCorpusDuplicates(ArrayList<String> uniqueLocalFrequencyList) {

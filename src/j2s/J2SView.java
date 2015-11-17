@@ -191,6 +191,7 @@ public class J2SView extends ViewPart {
 	};
 	
 	private static void createTestEvalData() {
+		//System.getProperty("user.home") + "/Downloads/methodSelection.txt"
 		String filename =
 				 "C:\\Users\\Sanchit\\Downloads\\AllEvalCases.txt";
 		String output =
@@ -217,17 +218,18 @@ public class J2SView extends ViewPart {
 					}
 //					outputWriter.println(sCurrentLine);
 				}
-				else if (sCurrentLine.equals("STOP")) {
-					break;
-				}
 				else {
 					writer.close();
 					GenerateSwiftQueryString tester = new GenerateSwiftQueryString();
 					ArrayList<String> searchKeywords = tester.executeFrequencyAnalysis(methodTested);
 					writer = new PrintWriter(methodTested, "UTF-8");
-					System.out.println("KEYWORDS: " + searchKeywords.toString());
-//					outputWriter.println("KEYWORDS: " + searchKeywords.toString());
-//					outputWriter.println();
+					System.out.println("Keywords: " + searchKeywords.toString());
+					
+					outputWriter.print("Keywords,");
+					for (String str : searchKeywords) {
+						outputWriter.print(str + " ");
+					}
+					outputWriter.println();
 					SearchAndRank sar = null;
 					try {
 						sar = new SearchAndRank(searchKeywords, outputWriter);
