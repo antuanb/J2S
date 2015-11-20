@@ -191,13 +191,20 @@ public class J2SView extends ViewPart {
 	};
 	
 	private static void createTestEvalData() {
-		//System.getProperty("user.home") + "/Downloads/methodSelection.txt"
+//		String filename =
+//				 "C:\\Users\\Sanchit\\Downloads\\AllEvalCases.txt";
+//		String output =
+//				 "C:\\Users\\Sanchit\\Downloads\\output.csv";
+//		String methodTested =
+//				 "C:\\Users\\Sanchit\\Downloads\\methodTested.txt";
+		
 		String filename =
-				 "C:\\Users\\Sanchit\\Downloads\\AllEvalCases.txt";
+				System.getProperty("user.home") + "/Downloads/AllEvalCases.txt";
 		String output =
-				 "C:\\Users\\Sanchit\\Downloads\\output.csv";
+				System.getProperty("user.home") + "/Downloads/output.csv";
 		String methodTested =
-				 "C:\\Users\\Sanchit\\Downloads\\methodTested.txt";
+				System.getProperty("user.home") + "/Downloads/methodTested.txt";
+		
 		BufferedReader br = null;
 		try {
 			String sCurrentLine;
@@ -208,14 +215,15 @@ public class J2SView extends ViewPart {
 				
 				sCurrentLine = sCurrentLine.trim();
 				if (!sCurrentLine.equals("")) {
-					writer.println(sCurrentLine);
 					if (sCurrentLine.equals("*/")) {
-						String methodHeader = br.readLine().split("\\(")[0];
+						sCurrentLine = br.readLine();
+						String methodHeader = sCurrentLine.split("\\(")[0];
 						String[] methodHeaderArray = methodHeader.split(" ");
 						String methodName = methodHeaderArray[methodHeaderArray.length - 1];
 						outputWriter.println(methodName);
 						outputWriter.println();
 					}
+					writer.println(sCurrentLine);
 //					outputWriter.println(sCurrentLine);
 				}
 				else {

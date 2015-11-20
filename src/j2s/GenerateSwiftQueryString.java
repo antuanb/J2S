@@ -27,6 +27,7 @@ public class GenerateSwiftQueryString {
 	public static ArrayList<String> controlFlowCodeSwift = new ArrayList<String>();
 	private static HashSet<String> javaAccessModifiers;
 	private static HashSet<String> javaNonAccessModifiers;
+	public static String inputLanguage = "";
 
 	static {
 		javaAccessModifiers = new HashSet<String>();
@@ -57,6 +58,16 @@ public class GenerateSwiftQueryString {
 				if (!sCurrentLine.equals("")) {
 					if (flag) {
 						if (sCurrentLine.startsWith("public") || sCurrentLine.startsWith("private")) {
+							if (sCurrentLine.contains(" func ")) {
+								inputLanguage = "swift";
+							} else {
+								inputLanguage = "java";
+							}
+							flag = false;
+							title = sCurrentLine;
+							parseControlFlowLine(sCurrentLine, true);
+						} else if (sCurrentLine.startsWith("func")) {
+							inputLanguage = "swift";
 							flag = false;
 							title = sCurrentLine;
 							parseControlFlowLine(sCurrentLine, true);
@@ -245,14 +256,26 @@ public class GenerateSwiftQueryString {
 	}
 
 	private static void parseControlFlowLine(String line, boolean isHeader) {
-		if (isHeader) {
-			parseMethodHeader(line);
-			String methodHeader = generateSwiftMethodHeader(controlFlowCodeSwift);
-			controlFlowCode.add(methodHeader);
-			controlFlowCode.add("// Insert Native-2-Native Result");
-		} else {
-			String curLine = controlFlowParser(line);
-			controlFlowCode.add(curLine);
+		if (inputLanguage == "java") {
+			if (isHeader) {
+				parseMethodHeader(line);
+				String methodHeader = generateSwiftMethodHeader(controlFlowCodeSwift);
+				controlFlowCode.add(methodHeader);
+				controlFlowCode.add("// Insert Native-2-Native Result");
+			} else {
+				String curLine = controlFlowParser(line);
+				controlFlowCode.add(curLine);
+			}
+		} else if (inputLanguage == "swift") {
+//			if (isHeader) {
+//				parseMethodHeader(line);
+//				String methodHeader = generateSwiftMethodHeader(controlFlowCodeSwift);
+//				controlFlowCode.add(methodHeader);
+//				controlFlowCode.add("// Insert Native-2-Native Result");
+//			} else {
+//				String curLine = controlFlowParser(line);
+//				controlFlowCode.add(curLine);
+//			}
 		}
 	}
 

@@ -82,9 +82,15 @@ public class ScrapeDataWithKeywords {
 				.newInstance("applicationKey");
 		WebSearchQuery query = factory.newWebSearchQuery();
 		query.withResultSetSize(ResultSetSize.LARGE);
-		com.googleapis.ajax.common.PagedList<WebResult> response = query
-				.withQuery(keywords + "swift website:www.stackoverflow.com")
-				.list();
+		
+		com.googleapis.ajax.common.PagedList<WebResult> response = null;
+		
+		if (GenerateSwiftQueryString.inputLanguage == "java") {
+			response = query.withQuery(keywords + "swift website:www.stackoverflow.com").list();
+		} else if (GenerateSwiftQueryString.inputLanguage == "swift") {
+			response = query.withQuery(keywords + "java website:www.stackoverflow.com").list();
+		}
+		
 		ArrayList<HashMap<String, String>> googleSearchResults = new ArrayList<HashMap<String, String>>();
 		for (WebResult result : response) {
 			HashMap<String, String> googleSearchResult = new HashMap<String, String>();
