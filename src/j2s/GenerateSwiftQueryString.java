@@ -1,6 +1,7 @@
 package j2s;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -102,7 +103,7 @@ public class GenerateSwiftQueryString {
 		return globalKeywords;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 //		String line = "private static String[] parseControlFlowLine(ArrayList<String> line, ArrayList<Boolean> isHeader) {";
 		// String line =
 		// "public static ArrayList<Double> main(String[] args) {";
@@ -110,13 +111,40 @@ public class GenerateSwiftQueryString {
 //		String methodHeader = generateSwiftMethodHeader(controlFlowCodeSwift);
 //		System.out.println(methodHeader);
 		
-		String filepath = "/Users/sanchit/Downloads/methodSelection.txt";
-		executeFrequencyAnalysis(filepath);
-		for (String test : controlFlowCode) {
-			if (!test.equals("")) {
-				System.out.println(test);
+//		String filepath = "/Users/sanchit/Downloads/methodSelection.txt";
+		String filepath = "C:\\Users\\Sanchit\\Downloads\\methodSelection.txt";
+		String sCurrentLine = "";
+		Boolean variableParse = false;
+		BufferedReader br = new BufferedReader(new FileReader(filepath));
+		while ((sCurrentLine = br.readLine()) != null) {
+			sCurrentLine = sCurrentLine.trim();
+			String varType = sCurrentLine.split(" ")[0];
+			if (sCurrentLine.startsWith("public")) {
+			parseMethodHeader(sCurrentLine);
+			String methodHeader = generateSwiftMethodHeader(controlFlowCodeSwift);
+			controlFlowCodeSwift.clear();
+			System.out.println(methodHeader);
+			} else if (sCurrentLine.startsWith("System.out.println")){
+				String[] printString = sCurrentLine.split("\"");
+				System.out.println("print(\"" + printString[1] + "\")");
+				variableParse = true;
+			} else if (variableParse) {
+				variableParse = false;
+				String type = processType(varType.toLowerCase());
+				if (type != "null") {
+					System.out.println("let " + sCurrentLine.split(" ")[1] + ":" + type + " = " + sCurrentLine.split(" ")[3].split(";")[0]);
+				}
+			} else {
+				System.out.println(sCurrentLine);
 			}
 		}
+		
+//		executeFrequencyAnalysis(filepath);
+//		for (String test : controlFlowCode) {
+//			if (!test.equals("")) {
+//				System.out.println(test);
+//			}
+//		}
 	}
 
 	public static void parseMethodHeader(String line) {
@@ -237,10 +265,12 @@ public class GenerateSwiftQueryString {
 		case "void":
 			return "void";
 		case "string":
-			return "NSString";
+			return "String";
 		case "double":
 			return "Double";
 		case "int":
+			return "Int";
+		case "integer":
 			return "Int";
 		case "char":
 			return "Character";

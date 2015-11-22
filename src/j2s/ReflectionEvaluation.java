@@ -415,7 +415,7 @@ public class ReflectionEvaluation {
 	public static String toLowerCase_Wrapper(String A) {
 		System.out.println("toLowerCase_Wrapper testing");
 		String toLowerCaseString = A;
-		return toLowerCaseString.toUpperCase();
+		return toLowerCaseString.toLowerCase();
 	}
 
 	/*
