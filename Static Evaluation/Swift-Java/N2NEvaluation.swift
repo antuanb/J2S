@@ -473,7 +473,7 @@ class N2NEvaluation {
 		let sizeArrayList:[String] = A
 		return sizeArrayList.count
 	}
-	
+
 	/*
 	* Returns a view of the portion of this list between the specified
 	* fromIndex, inclusive, and toIndex, exclusive. (If fromIndex and toIndex
@@ -497,10 +497,7 @@ class N2NEvaluation {
 	/*
 	* Appends all of the elements in the specified collection to the end of
 	* this list, in the order that they are returned by the specified
-	* collection's Iterator. The behavior of this operation is undefined if the
-	* specified collection is modified while the operation is in progress.
-	* (This implies that the behavior of this call is undefined if the
-	* specified collection is this list, and this list is nonempty.)
+	* collection's Iterator.
 	*/
 	func addAll_Wrapper(A: [String], B: [String]) -> Bool {
 		print("addAll_Wrapper testing")

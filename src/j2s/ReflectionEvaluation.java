@@ -1,5 +1,8 @@
 package j2s;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -15,6 +18,31 @@ public class ReflectionEvaluation {
 		// generateMethods("java.util.HashMap");
 //		generateMethods("java.lang.Integer");
 		// runMethods();
+		String filename =
+				 "C:\\Users\\Sanchit\\Downloads\\test.txt";
+		BufferedReader br = null;
+		boolean test = false;
+		try {
+			String sCurrentLine;
+			br = new BufferedReader(new FileReader(filename));
+			
+			while ((sCurrentLine = br.readLine()) != null) {	
+				sCurrentLine = sCurrentLine.trim();
+				if (sCurrentLine.contains("Google Rank")) {
+					test = false;
+				}
+				if (test) {
+					if (sCurrentLine != "\r\n")
+					System.out.println(sCurrentLine);
+				}
+				if (sCurrentLine.contains("Pre-rank")) {
+					test = true;
+				}
+				
+			}
+		} catch(Exception e) {
+			
+		}
 	}
 
 	public static void runMethods() {

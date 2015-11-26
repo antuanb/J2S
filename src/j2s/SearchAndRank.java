@@ -71,6 +71,7 @@ public class SearchAndRank {
 		filterKeys.add("public");
 		filterKeys.add("func");
 		filterKeys.add("wrapper");
+		filterKeys.add("print");
 		filterKeys.add("to");
 		filterKeys.add("\n");
 		filterKeys.add(".");

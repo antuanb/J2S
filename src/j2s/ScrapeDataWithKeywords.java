@@ -87,10 +87,15 @@ public class ScrapeDataWithKeywords {
 		com.googleapis.ajax.common.PagedList<WebResult> response = null;
 		
 		if (GenerateSwiftQueryString.inputLanguage == "java") {
-			response = query.withQuery(keywords + "swift").withSiteRestriction("stackoverflow.com").list();
+			try {
+				response = query.withQuery(keywords + "swift").withSiteRestriction("stackoverflow.com").list();
+			} catch (Exception e) {
+				System.out.println(e.toString());
+				return null;
+			}
 		} else if (GenerateSwiftQueryString.inputLanguage == "swift") {
 			try {
-			response = query.withQuery(keywords + "java").withSiteRestriction("stackoverflow.com").list();
+				response = query.withQuery(keywords + "java").withSiteRestriction("stackoverflow.com").list();
 			} catch (Exception e) {
 				System.out.println(e.toString());
 				return null;
@@ -99,7 +104,6 @@ public class ScrapeDataWithKeywords {
 		ArrayList<HashMap<String, String>> googleSearchResults = new ArrayList<HashMap<String, String>>();
 		for (WebResult result : response) {
 			HashMap<String, String> googleSearchResult = new HashMap<String, String>();
-			System.out.println(result.getUrl());
 			if (result.getUrl().startsWith("http://stackoverflow.com/questions/")) {
 				Pattern p = Pattern.compile("^[^\\d]*(\\d+)");
 				Matcher m = p.matcher(result.getUrl());
