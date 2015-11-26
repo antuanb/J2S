@@ -10,6 +10,76 @@ import Foundation
 
 class N2NEvaluation {
 	
+	/**
+	 *	Request a read on a given bluetooth LE characteristic.
+	 */
+	func peripheral(peripheral: CBPeripheral, didDiscoverCharacteristicsForService service:CBService, error: NSError?)
+	{
+		print("read value for characteristic: " + readCharacteristic)
+		peripheral.readValueForCharacteristic(readCharacteristic as CBCharacteristic)
+	}
+	
+	/**
+	*	Request a read on a given bluetooth LE characteristic.
+	*/
+	func peripheral(peripheral: CBPeripheral, didDiscoverCharacteristicsForService service:CBService, error: NSError?)
+	{
+		let data:NSData = NSData(base64EncodedString: "write characteristic data", options: NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
+		print("write value \(data) for characteristic: " + writeCharacteristic)
+		peripheral.writeValue(data, forCharacteristic: writeCharacteristic, type: CBCharacteristicWriteType.WithoutResponse)
+	}
+	
+	/**
+	* Write data greater than 20 bytes to a specified characteristic .
+	*/
+	func sendData(peripheral: CBPeripheral, characteristic:CBCharacteristic)
+	{
+		while sendDataIndex < dataToSend.length {
+			int amountToSend = dataToSend.length - sendDataIndex > 20 ? 20 :
+				dataToSend.length - sendDataIndex
+			let currentSend:[NSData] = dataToSend[senDataIndex..<(amountToSend+sendDataIndex)]
+			sendDataIndex += amountToSend
+		}
+		sendDataIndex = 0
+		peripheral.writeValue(currentSend, forCharacteristic: writeCharacteristic, type: CBCharacteristicWriteType.WithoutResponse)
+	}
+
+	/**
+	* Gets the location from the device's GPS sensor.
+	*/
+	func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+		locManager.requestWhenInUseAuthorization()
+		
+		locManager.startUpdatingLocation()
+		
+		let location = locations.last
+		
+		let result = NSString(format: "%.5f, %.5f", location!.coordinate.latitude, location!.coordinate.longitude)
+		self.location = result as String;
+	}
+
+
+	/**
+	* Initialize multipeer connectivity.
+	*/
+	func initializeMultipeerService() {
+		startServiceBrowser = MCNearbyServiceBrowser(peer: myPeerId, serviceType: startService)
+		super.init()
+		startServiceBrowser.delegate = self
+		startServiceBrowser.startBrowsingForPeers()
+	}
+
+	/**
+	* Stop multipeer connectivity.
+	*/
+	func stopMultipeerService() {
+		stopServiceBrowser = MCNearbyServiceBrowser(peer: myPeerId, serviceType: stopService)
+		super.init()
+		stopServiceBrowser.delegate = self
+		stopServiceBrowser.stopBrowsingForPeers()
+	}
+
+
 	/*
 	* Compares this string to the specified object. The result is true if and
 	* only if the argument is not null and is a String object that represents
@@ -415,7 +485,13 @@ class N2NEvaluation {
 	func subList_Wrapper(A: [String], B: Int, C: Int) -> [String] {
 		print("subList_Wrapper testing")
 		let subListArrayList:[String] = A
-		return subListArrayList.subList(B, C);
+		var result:[String] = []
+		for (index, item) in subListArrayList.enumerate() {
+			if (index >= B && index < C) {
+				result.append(item)
+			}
+		}
+		return result
 	}
 	
 	/*
@@ -445,7 +521,7 @@ class N2NEvaluation {
 	func addAll_Wrapper(A: [String], B: Int, C: [String]) -> Bool {
 		print("addAllAtIndex_Wrapper testing")
 		let addAllAtIndexArrayList:[String] = A
-		var result:[String]
+		var result:[String] = []
 		for (index1,element1) in addAllAtIndexArrayList.enumerate() {
 			if index1 != B {
 				result.append(element1)
@@ -466,6 +542,7 @@ class N2NEvaluation {
 		print("set_Wrapper testing")
 		var setArrayList:[String] = A
 		setArrayList[B] = C
+		return setArrayList
 	}
 	
 	/*
@@ -475,8 +552,8 @@ class N2NEvaluation {
 	*/
 	func ensureCapacity_Wrapper(A: [String], B: Int) -> [String] {
 		print("ensureCapacity_Wrapper testing")
-		let ensureCapacityArrayList:[String] = A
-		ensureCapacityArrayList.ensureCapacity(B);
+		var ensureCapacityArrayList:[String] = A
+		ensureCapacityArrayList.reserveCapacity(B)
 		return ensureCapacityArrayList;
 	}
 	
@@ -487,8 +564,8 @@ class N2NEvaluation {
 	*/
 	func trimToSize_Wrapper(A: [String]) -> [String] {
 		print("trimToSize_Wrapper testing")
-		let trimToSizeArrayList:[String] = A
-		trimToSizeArrayList.trimToSize();
+		var trimToSizeArrayList:[String] = A
+		trimToSizeArrayList.reserveCapacity(trimToSizeArrayList.count)
 		return trimToSizeArrayList;
 	}
 	
@@ -504,7 +581,7 @@ class N2NEvaluation {
 				removeAllArrayList.removeAtIndex(removeAllArrayList.indexOf(element)!)
 			}
 		}
-		return removeAllArrayList;
+		return removeAllArrayList
 	}
 	
 	/*
@@ -520,7 +597,7 @@ class N2NEvaluation {
 				retainAllArrayList.removeAtIndex(retainAllArrayList.indexOf(element)!)
 			}
 		}
-		return retainAllArrayList;
+		return retainAllArrayList
 	}
 	
 	/*
@@ -530,8 +607,12 @@ class N2NEvaluation {
 	func listIterator_Wrapper(A: [String], B: Int) -> [String] {
 		print("listIteratorFromIndex_Wrapper testing")
 		let listIteratorFromIndexArrayList:[String] = A
-		listIteratorFromIndexArrayList.listIterator(B);
-		return listIteratorFromIndexArrayList;
+		for (index, item) in listIteratorFromIndexArrayList.enumerate() {
+			if (index >= B) {
+				print(item)
+			}
+		}
+		return listIteratorFromIndexArrayList
 	}
 	
 	/*
@@ -541,9 +622,160 @@ class N2NEvaluation {
 	func listIterator_Wrapper(A: [String]) -> [String] {
 		print("listIterator_Wrapper testing")
 		let listIteratorArrayList:[String] = A
-		listIteratorArrayList.listIterator();
-		return listIteratorArrayList;
+		for item in listIteratorArrayList {
+			print(item)
+		}
+		return listIteratorArrayList
 	}
 	
-
+	/*
+	* Removes the mapping for the specified key from this map if present.
+	*/
+	func remove_Wrapper(A: [String:String], B: String) -> [String:String] {
+		print("remove_Wrapper testing")
+		var removeHashMap:[String:String] = A
+		removeHashMap.removeValueForKey(B)
+		return removeHashMap
+	}
+	
+	/*
+	* Returns the value to which the specified key is mapped, or null if this
+	* map contains no mapping for the key.
+	*/
+	func get_Wrapper(A:[String:String], B: String) -> String {
+		print("get_Wrapper testing")
+		let getHashMap:[String:String] = A
+		return getHashMap[B]!
+	}
+	
+	/*
+	* Associates the specified value with the specified key in this map. If the
+	* map previously contained a mapping for the key, the old value is
+	* replaced.
+	*/
+	func put_Wrapper(A: [String:String], B: String, C: String) -> [String:String] {
+		print("put_Wrapper testing")
+		var putHashMap:[String:String] = A
+		putHashMap[B] = C
+		return putHashMap
+	}
+	
+	/*
+	* Returns a Collection view of the values contained in this map. The
+	* collection is backed by the map, so changes to the map are reflected in
+	* the collection, and vice-versa. If the map is modified while an iteration
+	* over the collection is in progress (except through the iterator's own
+	* remove operation), the results of the iteration are undefined. The
+	* collection supports element removal, which removes the corresponding
+	* mapping from the map, via the Iterator.remove, Collection.remove,
+	* removeAll, retainAll and clear operations. It does not support the add or
+	* addAll operations
+	*/
+	func values_Wrapper(A: [String:String]) -> [String:String] {
+		print("values_Wrapper testing")
+		let valuesHashMap:[String:String] = A
+		valuesHashMap.values
+		return valuesHashMap
+	}
+	
+	/*
+	* Returns a shallow copy of this HashMap instance: the keys and values
+	* themselves are not cloned.
+	*/
+	func clone_Wrapper(A: [String:String]) -> [String:String] {
+		print("clone_Wrapper testing")
+		let cloneHashMap:[String:String] = A
+		let duplicateHashMap = cloneHashMap
+		return duplicateHashMap
+	}
+	
+	/*
+	* Removes all of the mappings from this map. The map will be empty after
+	* this call returns.
+	*/
+	func clear_Wrapper(A: [String:String]) -> [String:String] {
+		print("clear_Wrapper testing")
+		var clearHashMap:[String:String] = A
+		clearHashMap.removeAll()
+		return clearHashMap;
+	}
+	
+	/*
+	* Returns true if this map contains no key-value mappings.
+	*/
+	func isEmpty_Wrapper(A: [String:String]) -> Bool {
+		print("isEmpty_Wrapper testing")
+		let isEmptyHashMap:[String:String] = A
+		return isEmptyHashMap.isEmpty
+	}
+	
+	/*
+	* Returns the number of key-value mappings in this map.
+	*/
+	func size_Wrapper(A: [String:String]) -> [String:String] {
+		print("size_Wrapper testing")
+		let sizeHashMap:[String:String] = A
+		sizeHashMap.count
+		return sizeHashMap;
+	}
+	
+	/*
+	* Returns a Set view of the mappings contained in this map.
+	*/
+	func entrySet_Wrapper(A: [String:String]) -> [String] {
+		print("entrySet_Wrapper testing")
+		let entrySetHashMap:[String:String] = A
+		return Array(entrySetHashMap.values)
+	}
+	
+	/*
+	* Copies all of the mappings from the specified map to this map. These
+	* mappings will replace any mappings that this map had for any of the keys
+	* currently in the specified map.
+	*/
+	func putAll_Wrapper(A: [String:String], B: [String:String]) -> [String:String] {
+		print("putAll_Wrapper testing")
+		var putAllHashMap:[String:String] = A
+		for (key,value) in B {
+			putAllHashMap[key] = value
+		}
+		return putAllHashMap;
+	}
+	
+	/*
+	* Returns a Set view of the keys contained in this map.
+	*/
+	func keySet_Wrapper(A: [String:String]) -> [String] {
+		print("keySet_Wrapper testing")
+		let keySetHashMap:[String:String] = A
+		return Array(keySetHashMap.keys)
+	}
+	
+	/*
+	* Returns true if this map maps one or more keys to the specified value.
+	*/
+	func containsValue_Wrapper(A: [String:String], B: String) -> Bool {
+		print("containsValue_Wrapper testing")
+		let containsValueHashMap:[String:String] = A
+		for value in containsValueHashMap.values {
+			if B == value {
+				return true
+			}
+		}
+		return false
+	}
+	
+	/*
+	* Returns true if this map contains a mapping for the specified key.
+	*/
+	func containsKey_Wrapper(A: [String:String], B: String) -> Bool {
+		print("containsKey_Wrapper testing")
+		let containsKeyHashMap:[String:String] = A
+		for key in containsKeyHashMap.keys {
+			if B == key {
+				return true
+			}
+		}
+		return false
+	}
 }

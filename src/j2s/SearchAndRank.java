@@ -439,7 +439,9 @@ public class SearchAndRank {
 		String token = t;
 		if (t.contains("map")) {
 			token = "dictionary";
-		} else if (t.contains("hash")) {
+		} else if (t.contains("array")) {
+			token = "list";
+		} else if (t.contains("hash") || t.contains("list")) {
 			return "";
 		}
 		return token;
