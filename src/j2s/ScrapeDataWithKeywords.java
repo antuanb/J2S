@@ -95,6 +95,7 @@ public class ScrapeDataWithKeywords {
 				System.out.println(e.toString());
 				return null;
 			}
+		}
 		ArrayList<HashMap<String, String>> googleSearchResults = new ArrayList<HashMap<String, String>>();
 		for (WebResult result : response) {
 			HashMap<String, String> googleSearchResult = new HashMap<String, String>();
