@@ -69,7 +69,9 @@ public class SearchAndRank {
 		filterKeys = new HashSet<String>();
 		filterKeys.add(" ");
 		filterKeys.add("public");
-		filterKeys.add("string");
+		filterKeys.add("func");
+		filterKeys.add("wrapper");
+		filterKeys.add("to");
 		filterKeys.add("\n");
 		filterKeys.add(".");
 		filterKeys.add(",");
@@ -109,7 +111,9 @@ public class SearchAndRank {
 		if (outputWriter != null) {
 			outputWriter.println("Pre-rank");
 		}
-		search(outputWriter);
+		boolean success = search(outputWriter);
+		if (success) {
+			
 		System.out.println("search");
 		// writeObject();
 		//System.out.println("writing");
@@ -119,6 +123,9 @@ public class SearchAndRank {
 		rank(outputWriter);
 		System.out.println("sorted and ranked, final list size is: " + sortedFinalRanking.size());
 		System.out.println("finalStackOverflowResultsList size: " + finalStackOverflowResultsList.size());
+		} else {
+			throw new IOException("TimeOut");
+		}
 	}
 	
 	public static void synthesize(int index) {
@@ -186,7 +193,7 @@ public class SearchAndRank {
 		}
 	}
 
-	private void search(PrintWriter outputWriter) {
+	private boolean search(PrintWriter outputWriter) {
 		for (String keyword : fullKeywordSet) {
 //			queryResultStackOverflow = ScrapeDataWithKeywords.executeStackOverflowQuery(keyword);
 //			for (int i = 0; i < queryResultStackOverflow.size(); i++) {
@@ -201,7 +208,9 @@ public class SearchAndRank {
 //			}
 
 			queryResultGoogleStack = ScrapeDataWithKeywords.executeGoogleSearchQuery_Stack(keyword);
-
+			if (queryResultGoogleStack == null) {
+				return false;
+			}
 			if (TEST_THROTTLE) {
 				try {
 					Thread.sleep(60000);
@@ -274,6 +283,7 @@ public class SearchAndRank {
 			// do something with each all query result
 			// }
 		}
+		return true;
 
 	}
 
@@ -410,6 +420,9 @@ public class SearchAndRank {
 		for (String token : tempTokens) {
 			// camelCase, Class/method names etc
 			String[] codeTokens = token.split("(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|([0-9]+)|=|(\\()|(\\))|(\\.)|(\\_)|(\\n)|(\\-)|(\\')");//|(([a-z]|[A-Z])([0-9])([a-z]|[A-Z]))");
+			for (int i = 0; i < codeTokens.length; i++) {
+				codeTokens[i] = codeTokens[i].toLowerCase();
+			}
 			finalTokens.addAll(Arrays.asList(codeTokens));
 		}
 
@@ -464,11 +477,11 @@ public class SearchAndRank {
 
 	private static void filterTokens(ArrayList<String> tokens) {
 		for (String key : filterKeys) {
-			if (tokens.contains(key)) {
+//			if (tokens.contains(key)) {
 				while (tokens.remove(key)) {
 
 				}
-			}
+//			}
 		}
 	}
 

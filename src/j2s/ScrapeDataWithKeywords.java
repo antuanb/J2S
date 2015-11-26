@@ -88,7 +88,12 @@ public class ScrapeDataWithKeywords {
 		if (GenerateSwiftQueryString.inputLanguage == "java") {
 			response = query.withQuery(keywords + "swift website:www.stackoverflow.com").list();
 		} else if (GenerateSwiftQueryString.inputLanguage == "swift") {
+			try {
 			response = query.withQuery(keywords + "java website:www.stackoverflow.com").list();
+			} catch (Exception e) {
+				System.out.println(e.toString());
+				return null;
+			}
 		}
 		
 		ArrayList<HashMap<String, String>> googleSearchResults = new ArrayList<HashMap<String, String>>();

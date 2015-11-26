@@ -191,19 +191,19 @@ public class J2SView extends ViewPart {
 	};
 	
 	private static void createTestEvalData() {
-//		String filename =
-//				 "C:\\Users\\Sanchit\\Downloads\\AllEvalCases.txt";
-//		String output =
-//				 "C:\\Users\\Sanchit\\Downloads\\output.csv";
-//		String methodTested =
-//				 "C:\\Users\\Sanchit\\Downloads\\methodTested.txt";
-		
 		String filename =
-				System.getProperty("user.home") + "/Downloads/AllEvalCases.txt";
+				 "C:\\Users\\Sanchit\\Downloads\\AllEvalCases.txt";
 		String output =
-				System.getProperty("user.home") + "/Downloads/output.csv";
+				 "C:\\Users\\Sanchit\\Downloads\\output.csv";
 		String methodTested =
-				System.getProperty("user.home") + "/Downloads/methodTested.txt";
+				 "C:\\Users\\Sanchit\\Downloads\\methodTested.txt";
+		
+//		String filename =
+//				System.getProperty("user.home") + "/Downloads/AllEvalCases.txt";
+//		String output =
+//				System.getProperty("user.home") + "/Downloads/output.csv";
+//		String methodTested =
+//				System.getProperty("user.home") + "/Downloads/methodTested.txt";
 		
 		BufferedReader br = null;
 		try {
@@ -242,7 +242,13 @@ public class J2SView extends ViewPart {
 					try {
 						sar = new SearchAndRank(searchKeywords, outputWriter);
 					} catch (IOException e) {
-						e.printStackTrace();
+						if (e.getMessage() == "TimeOut") {
+						resetStaticVariables();
+						outputWriter.println();
+						outputWriter.println("---------------------------------------");
+						outputWriter.println();
+						break;
+						}
 					} catch (ClassNotFoundException e) {
 						e.printStackTrace();
 					}
@@ -300,7 +306,9 @@ public class J2SView extends ViewPart {
 //		System.out.println("Number 2 ranked answer body is: ");
 //		System.out.println(rankedResults.get(1).getAnswerBody().toString());
 		
+
 		createTestEvalData();
+
 	}
 
 	private ISelectionListener selectionListener = new ISelectionListener() {

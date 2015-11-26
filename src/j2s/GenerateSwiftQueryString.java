@@ -76,14 +76,19 @@ public class GenerateSwiftQueryString {
 						// carry over method header comments to swift file
 						else {
 							controlFlowCode.add(sCurrentLine);
+							StringTokenizer st = new StringTokenizer(sCurrentLine);
+							while (st.hasMoreTokens()) {
+								body += st.nextToken() + " ";
+							}
 						}
 					} else {
 						parseControlFlowLine(sCurrentLine, false);
+						StringTokenizer st = new StringTokenizer(sCurrentLine);
+						while (st.hasMoreTokens()) {
+							body += st.nextToken() + " ";
+						}
 					}
-					StringTokenizer st = new StringTokenizer(sCurrentLine);
-					while (st.hasMoreTokens()) {
-						body += st.nextToken() + " ";
-					}
+					
 				}
 			}
 		} catch (IOException e) {
