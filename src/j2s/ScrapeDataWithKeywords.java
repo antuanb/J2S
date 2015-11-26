@@ -78,6 +78,7 @@ public class ScrapeDataWithKeywords {
 
 	public static ArrayList<HashMap<String, String>> executeGoogleSearchQuery_Stack(
 			String keywords) {
+		
 		GoogleSearchQueryFactory factory = GoogleSearchQueryFactory
 				.newInstance("applicationKey");
 		WebSearchQuery query = factory.newWebSearchQuery();
@@ -86,19 +87,18 @@ public class ScrapeDataWithKeywords {
 		com.googleapis.ajax.common.PagedList<WebResult> response = null;
 		
 		if (GenerateSwiftQueryString.inputLanguage == "java") {
-			response = query.withQuery(keywords + "swift website:www.stackoverflow.com").list();
+			response = query.withQuery(keywords + "swift").withSiteRestriction("stackoverflow.com").list();
 		} else if (GenerateSwiftQueryString.inputLanguage == "swift") {
 			try {
-			response = query.withQuery(keywords + "java website:www.stackoverflow.com").list();
+			response = query.withQuery(keywords + "java").withSiteRestriction("stackoverflow.com").list();
 			} catch (Exception e) {
 				System.out.println(e.toString());
 				return null;
 			}
-		}
-		
 		ArrayList<HashMap<String, String>> googleSearchResults = new ArrayList<HashMap<String, String>>();
 		for (WebResult result : response) {
 			HashMap<String, String> googleSearchResult = new HashMap<String, String>();
+			System.out.println(result.getUrl());
 			if (result.getUrl().startsWith("http://stackoverflow.com/questions/")) {
 				Pattern p = Pattern.compile("^[^\\d]*(\\d+)");
 				Matcher m = p.matcher(result.getUrl());

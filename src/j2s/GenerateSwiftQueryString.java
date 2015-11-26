@@ -116,8 +116,8 @@ public class GenerateSwiftQueryString {
 //		String methodHeader = generateSwiftMethodHeader(controlFlowCodeSwift);
 //		System.out.println(methodHeader);
 		
-//		String filepath = "/Users/sanchit/Downloads/methodSelection.txt";
-		String filepath = "C:\\Users\\Sanchit\\Downloads\\methodSelection.txt";
+		String filepath = "/Users/sanchit/Downloads/methodSelection.txt";
+//		String filepath = "C:\\Users\\Sanchit\\Downloads\\methodSelection.txt";
 		String sCurrentLine = "";
 		Boolean variableParse = false;
 		BufferedReader br = new BufferedReader(new FileReader(filepath));
@@ -285,6 +285,8 @@ public class GenerateSwiftQueryString {
 			return "List";
 		case "list":
 			return "List";
+		case "map":
+			return "[String, String]";
 		default:
 			return "null";
 		}
