@@ -20,29 +20,44 @@ public class ReflectionEvaluation {
 		// runMethods();
 		String filename =
 				 "C:\\Users\\Sanchit\\Downloads\\test.txt";
+		String filename2 =
+				 "C:\\Users\\Sanchit\\Downloads\\out.txt";
 		BufferedReader br = null;
+		PrintWriter writer = null;
 		boolean test = false;
 		try {
+			int num = 1;
+			writer = new PrintWriter(filename2, "UTF-8");
 			String sCurrentLine;
 			br = new BufferedReader(new FileReader(filename));
 			
-			while ((sCurrentLine = br.readLine()) != null) {	
-				sCurrentLine = sCurrentLine.trim();
-				if (sCurrentLine.contains("Google Rank")) {
-					test = false;
-				}
-				if (test) {
-					if (sCurrentLine != "\r\n")
-					System.out.println(sCurrentLine);
-				}
-				if (sCurrentLine.contains("Pre-rank")) {
-					test = true;
-				}
+			while ((sCurrentLine = br.readLine()) != null) {
 				
+				if (sCurrentLine.contains("/*")) {
+					writer.println("\\begin{figure}[H]\n\\centering\n\\lstset{language=[Objective]C,morekeywords={func,var,let,try,catch,if,while,true,false,print}}\n\\begin{lstlisting}[mathescape=true]");
+					writer.println(sCurrentLine);
+				} else if (sCurrentLine.equals("}")) {
+					writer.println(sCurrentLine);
+					writer.println("\\end{lstlisting}\n\\caption{}\n\\label{fig:eval" + num++ +"}\n\\end{figure}");
+				} else {
+					writer.println(sCurrentLine);
+				}
+//				sCurrentLine = sCurrentLine.trim();
+//				if (sCurrentLine.contains("Google Rank")) {
+//					test = false;
+//				}
+//				if (test) {
+//					if (sCurrentLine != "\r\n")
+//					System.out.println(sCurrentLine);
+//				}
+//				if (sCurrentLine.contains("Pre-rank")) {
+//					test = true;
+//				}
 			}
 		} catch(Exception e) {
 			
 		}
+		writer.close();
 	}
 
 	public static void runMethods() {
